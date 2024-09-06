@@ -24,3 +24,11 @@ db.mongoose_practice
   .find({ age: 17 })
   .project({ gender: 1, age: 1, name: 1, email: 1 });
 ```
+
+---
+
+## Mongodb Operators
+
+### Working on mongodb operators listed below. Ref **_[MongodbQuery(Operators)](https://www.mongodb.com/docs/manual/reference/operator/query/)_**
+
+> **_$eq, $neq, $gt, $lt, $gte, $lte $nin_**
