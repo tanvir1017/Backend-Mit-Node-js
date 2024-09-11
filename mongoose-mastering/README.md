@@ -170,3 +170,49 @@ db.mongoose_practice.find({ company: { $type: "null" } }, { company: 1 });
 // $size => to check empty arry from collection
 db.mongoose_practice.find({ friends: { $size: 0 } }, { friends: 1 });
 ```
+
+# Practice
+
+```javascript
+/**
+ * 1.  Find all documents in the collection where the age is greater than 30, and only return the name and email fields.
+ * 2.  Find documents where the favorite color is either "Maroon" or "Blue."
+ * 3.  Find all documents where the skills is an empty array.
+ * 4.  Find documents where the person has skills in both "JavaScript" and "Java."
+ * 5.  Add a new skill to the skills array for the document with the email "aminextleveldeveloper@gmail.com" The skill is {"name": "Python", "level": "Beginner", "isLearning": true}.
+ * 6.  Add a new language "Spanish" to the list of languages spoken by the person.
+ * 7.  Remove the skill with the name "Kotlin" from the skills array.
+ *
+ */
+
+///////////////////////////////////////////// Question 01 -> Answer /////////////////////////////////////////////////////////////////////////////////
+// db.mongoose_practice.find({ age: { $gt: 30 } }, {name:1, email:1, age:1}).sort({age: 1}) // Type 1
+// db.mongoose_practice.find({ age: { $gt: 30 } }).project({name:1, email:1, age:1}).sort({age: 1}) // Type 1
+
+///////////////////////////////////////////// Question 02 -> Answer /////////////////////////////////////////////////////////////////////////////////
+// db.mongoose_practice.find({$or:[{favoutiteColor:"Maroon"},{ favoutiteColor: "Blue"}]}).project({favoutiteColor:1})
+
+///////////////////////////////////////////// Question 03 -> Answer /////////////////////////////////////////////////////////////////////////////////
+// db.mongoose_practice.find({skills:{ $size: 0 }}, {skills:1}) // finding an empty array
+
+///////////////////////////////////////////// Question 04 -> Answer /////////////////////////////////////////////////////////////////////////////////
+// db.mongoose_practice.find({ $and:[{'skills.name': "JAVASCRIPT"}, {"skills.name": 'JAVA'}]}).project({ "skills.name": 1 })
+
+///////////////////////////////////////////// Question 05 -> Answer /////////////////////////////////////////////////////////////////////////////////
+/* db.mongoose_practice.updateOne({
+    email: "aminextleveldeveloper@gmail.com"
+}, {
+    $push: {skills:{"name": "Python", "level": "Beginner", "isLearning": true}}
+})
+*/
+
+///////////////////////////////////////////// Question 06 -> Answer /////////////////////////////////////////////////////////////////////////////////
+// db.mongoose_practice.updateMany({}, {$push: {languages:"Spanish"}})
+
+///////////////////////////////////////////// Question 07 -> Answer /////////////////////////////////////////////////////////////////////////////////
+// db.mongoose_practice.updateMany({}, {$pull:{skills:{name: "KOTLIN"}}})
+db.mongoose_practice.find(
+  { "skills.name": "JAVASCRIPT" },
+  { "skills.name": 1 }
+);
+```
