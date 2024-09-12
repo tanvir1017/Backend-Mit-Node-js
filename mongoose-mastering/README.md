@@ -200,11 +200,11 @@ db.mongoose_practice.find({ friends: { $size: 0 } }, { friends: 1 });
 
 ///////////////////////////////////////////// Question 05 -> Answer /////////////////////////////////////////////////////////////////////////////////
 /* db.mongoose_practice.updateOne({
-    email: "aminextleveldeveloper@gmail.com"
-}, {
-    $push: {skills:{"name": "Python", "level": "Beginner", "isLearning": true}}
-})
-*/
+        email: "aminextleveldeveloper@gmail.com"
+    }, {
+        $push: {skills:{"name": "Python", "level": "Beginner", "isLearning": true}}
+    })
+    */
 
 ///////////////////////////////////////////// Question 06 -> Answer /////////////////////////////////////////////////////////////////////////////////
 // db.mongoose_practice.updateMany({}, {$push: {languages:"Spanish"}})
@@ -215,4 +215,129 @@ db.mongoose_practice.find(
   { "skills.name": "JAVASCRIPT" },
   { "skills.name": 1 }
 );
+```
+
+## Aggregate Methods
+
+### `$match` | `$project`
+
+> $coming soon$
+
+```js
+
+```
+
+### `$out` | `$addFields`| `$merge`
+
+> $coming soon$
+
+```js
+
+```
+
+### `$group` | `$sum` | `$push`
+
+> In Aggregate Methods the `$group` operator grouping all together based on documents field. The `$` symbol inside the `$group` operator indicates the documents field from collection such as => $age$, $email$, $country$
+
+```js
+/*
+    Inside aggregate array everything wrap up with 
+    {} baches is called stage. every stage is time consuming, so what will be the response time based on stage in aggregation function.
+
+    The less you use stage, the less time will take.
+  */
+db.mongoose_practice.aggregate([
+  {
+    /*
+     Stage 1  `$` used to refer the property or Field from a document of collection. `$group` method help to group the document into seared collection based on matched field.
+     For example you want to group every collection whom gender match with "Female" or "Male", then the group aggregate method will help you to group them into several collection
+    */
+    //  Stage 1
+    $group: {
+      _id: "$age",
+      /**
+       *  @Accumulate via `$sum`
+       * after grouping via `_id: "$field"`
+       * we can do some accumulations to the collection. It will help us to control what need to show or return via api endpoints. Like if you look at the next line the `$sum` operator will help to count what is the total document which was grouped by `$age`. Oh, and the total property is not other than a variable or property. You can name it as you want
+       * */
+      total: { $sum: 1 },
+      /**
+       *  @Accumulate via `$push`
+       * The push operator in aggregate functions will help you inject data from collection which you need. Like you first grouped collection of data by age after that you now want to see the name, email, address(anything exist to the document), you can use `$push` operator to mentioned the field you need. But there is a case that you need to show the full document then you will  have to use `$$ROOT` operator.
+       *
+       * */
+      // fullDocument:{$push: "$name"}
+      // fullDocument:{$push: "$age"}
+      // fullDocument:{$push: "$email"} // OR
+      fullDocument: { $push: "$$ROOT" },
+    },
+  },
+]);
+```
+
+### `$unwind`
+
+> $coming soon$
+
+```js
+
+```
+
+### `$bucket` in MongoDB
+
+> In MongoDB there is a aggregation operator called `$bucket` which is actually do nothing but categorizes the incoming documents based on `boundaries -> []`, `expressions`
+
+<h1>Syntax</h1>
+
+```javascript
+{
+  $bucket: {
+      groupBy: <expression>, // based on which field you wanna to categorize the documents
+      boundaries: [ <lowerbound1>, <lowerbound2>, ... ],
+      default: <literal>,
+      output: {
+         <output1>: { <$accumulator expression> },
+         ...
+         <outputN>: { <$accumulator expression> }
+      }
+   }
+}
+```
+
+```js
+db.mongoose_practice.aggregate([
+  // STAGE 1
+  /*
+    Make a group of docs with bucket. Grouping via $age and settings the boundaries which documents has <20, <40, <60, <80
+  */
+  {
+    $bucket: {
+      groupBy: "$age",
+      boundaries: [20, 40, 60, 80],
+      default: "80 er uporer bura gula",
+      output: {
+        count: { $sum: 1 },
+        data: { $push: "$$ROOT" },
+      },
+    },
+  },
+
+  // STAGE 2
+  /* Sorting data in defending way */
+  {
+    $sort: { count: -1 },
+  },
+  // STAGE 3
+
+  /* Limiting them into 2 docs */
+  {
+    $limit: 2,
+  },
+
+  // STAGE 4
+  /* What to show */
+  {
+    $project: { count: 1 },
+  },
+]);
 ```
