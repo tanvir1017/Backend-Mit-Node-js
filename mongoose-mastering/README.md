@@ -341,3 +341,98 @@ db.mongoose_practice.aggregate([
   },
 ]);
 ```
+
+### `$facet` in MongoDB
+
+>
+
+<h1>Syntax</h1>
+
+```javascript
+// $facet syntax
+/*
+db.mongoose_practice.aggregate([
+    {
+        $facet: {
+            Pipline declaration(should be an array)
+             "skills": [
+                // Stage 1
+                {
+                    $unwind: "$skills" // it will break every array into object from this(mongoose_pratice) collection 
+                }
+
+                // Stage 2
+                {
+                    $group: { _id: "$skills", count: { $sum: 1 } }
+                }
+            ],
+            
+            
+            // you can use more pipline as you want. 
+        }
+    }
+])    
+
+*/
+db.mongoose_practice.aggregate([
+  {
+    $facet: {
+      // Pipline 1
+      interests: [
+        // Stage 1
+        {
+          $unwind: "$interests",
+        },
+
+        // Stage 2
+        {
+          $group: {
+            _id: "$interests",
+            count: { $sum: 1 },
+            whoseHaveSimillerInterests: {
+              $push: { person: "$name.firstName" },
+            },
+          },
+        },
+      ],
+    },
+  },
+]);
+```
+
+### INDEXING AND COLLSCAN
+
+---
+
+> When we'll work with backend we frequently need to do searching or finding operations to fill-up the user or apps needs. For an example we've to find a user information with his/her posted blogs from a collection. In that case we can use couple of things like `COLLSCAN` and `INDEXING`.
+>
+> > `COLLSCAN` 🔎 <br/>
+> >
+> > <h4>What exactly ➡️ COLLSCAN ⬅️ is?</h4>
+> > Suppose the collection (you are operating on) is a book and you have to find a specific sentence or word from that book, in that case ➡️ COLLSCAN ⬅️ will search this sentence or word from that book by exploring every page and by reading every sentence or word🥵. Which will impact the database performance as well as it will take unnecessary time to show data to client, right?
+> > <br/>
+> > <h3>What's the solutions we've❓</h3>
+> > <br/>
+
+> > The solution will be `INDEXING 🔎` <br/>
+> > We can use `indexing` to find out the specific need from a database collection. You can assume indexing like a indexing page from a book, where that page mentioned which page does what. And the `indexing` operation just read the index page and simply go to that page to find out the need for user. Interssant right? 🫡. In other word `INDEXING` called ➡️`IXSCAN`⬅️
+
+## How to `Indexing`
+
+```javascript
+//  Single Indexing via command or method
+ 1. db.getCollection("massive-data").createIndex({email:1})
+
+ // To explore the execution statistics
+ 2. db.getCollection('massive-data').find({gender:"male", age: {$gte: 18}}).explain("executionStats")
+
+// Compound Indexing or multiple Indexing by order of indexing
+ 3. db.getCollection("massive-data").createIndex({gender: -1, age: 1})
+
+// How to remove indexing from index `dropIndex`
+ 4. db["massive-data"].dropIndex({email:1})
+
+ // How to index text to find specific text from a lot value
+
+ 5. db.getCollection("massive-data").createIndex({about: "text"})
+```
