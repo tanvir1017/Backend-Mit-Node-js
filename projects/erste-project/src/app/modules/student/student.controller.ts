@@ -15,8 +15,12 @@ const createStudentController = async (req: Request, res: Response) => {
       message: "Student created successfully",
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "something went wrong!!",
+      error: error,
+    });
   }
 };
 
@@ -30,7 +34,11 @@ const getAllStudent = async (__req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "something went wrong!!",
+      error: error,
+    });
   }
 };
 
@@ -69,13 +77,17 @@ const getSingleStudentById = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(404).send({
+    res.status(404).json({
       success: false,
       message: "Id not found from client",
       data: {},
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "something went wrong!!",
+      error: error,
+    });
   }
 };
 
