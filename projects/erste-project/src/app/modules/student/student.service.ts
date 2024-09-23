@@ -31,9 +31,25 @@ const deleteStudentFromDB = async (id: string) => {
   return result;
 };
 
+/**
+ * Updating student information from db
+ * @param {string} id
+ * @param {object} fieldAndValue The object from req.body
+ */
+const updateStudentFromDB = async <T extends StudentInterface.Student>(
+  id: string,
+  fieldAndValue: T,
+) => {
+  const result = await StudentModel.updateOne(
+    { id },
+    { $set: { ...fieldAndValue } },
+  );
+};
+
 export const studentService = {
   createStudentIntoDB,
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,
+  updateStudentFromDB,
 };

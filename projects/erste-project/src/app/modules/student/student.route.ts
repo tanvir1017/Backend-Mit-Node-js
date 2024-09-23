@@ -18,4 +18,7 @@ router
   .route("/:studentId/student-delete")
   .delete(StudentController.deleteStudentById); // Type 1 that I like
 
+// update single student by id
+router.route("/:studentId/student-update").put(StudentController.updateStudent); // Type 1 that I like
+
 export const StudentsRoute = router;

@@ -134,9 +134,39 @@ const deleteStudentById = async (req: Request, res: Response) => {
   }
 };
 
+const updateStudent = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params;
+    const { studentUpdateAbleInfo } = req.body;
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        message: "Student id is required",
+      });
+    }
+
+    const result = await studentService.updateStudentFromDB(
+      studentId,
+      studentUpdateAbleInfo,
+    );
+    res.status(200).json({
+      success: true,
+      message: "Student updated successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "something went wrong",
+      error: error.message,
+    });
+  }
+};
+
 export const StudentController = {
   createStudent,
   getAllStudent,
   getSingleStudentById,
   deleteStudentById,
+  updateStudent,
 };

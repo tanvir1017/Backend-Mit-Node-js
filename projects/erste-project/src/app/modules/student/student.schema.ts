@@ -96,108 +96,116 @@ const LocalGuardianSchema = new mongoose.Schema<StudentInterface.LocalGuardian>(
   },
 );
 
-const StudentSchema = new mongoose.Schema<StudentInterface.Student>({
-  id: {
-    type: String,
-    required: [true, "Id must be provided"],
-    unique: true,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Password must be provided"],
-    max: [20, "Password must be in 20 characters long"],
-    trim: true,
-  },
-  name: {
-    type: UserNameSchema,
-    required: [true, "Name property missing please re-check "],
-    trim: true,
-  },
-  age: {
-    type: Number,
-    required: [true, "Age must be provided"],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ["male", "female", "others"],
-      message: "{VALUE} is not a valid gender",
+const StudentSchema = new mongoose.Schema<StudentInterface.Student>(
+  {
+    id: {
+      type: String,
+      required: [true, "Id must be provided"],
+      unique: true,
+      trim: true,
     },
-    required: [
-      true,
-      "Gender must be provided and it should be Male, Female or Others",
-    ],
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: [
-      true,
-      "Email must be provided and it should be a valid email address",
-    ],
-    trim: true,
-    // validate: {
-    //   validator: (value: string) => validator.isEmail(value),
-    //   message: "{VALUE} is not a valid email address",
-    // },
-  },
-  dateOfBirth: {
-    type: String,
-    trim: true,
-  },
-  contactNo: {
-    type: String,
-    required: [true, "ContactNo must be provided"],
-    trim: true,
-  },
-  emergencyContactNumber: {
-    type: String,
-    required: [true, "Emergency Contact Number must be provided"],
-    trim: true,
-  },
-  presentAddress: {
-    type: String,
-    required: [true, "Present Address must be provided"],
-    trim: true,
-  },
-  permanentAddress: {
-    type: String,
-    required: [true, "Permanent Address Mut Be Provided"],
-    trim: true,
-  },
-  bloodGroup: {
-    type: String,
-    enum: {
-      values: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
-      message: "{VALUE} is not a valid blood group for human",
+    password: {
+      type: String,
+      required: [true, "Password must be provided"],
+      max: [20, "Password must be in 20 characters long"],
+      trim: true,
     },
-    required: [true, "Blood Group must be a valid blood group for human"],
-  },
-  guardian: {
-    type: GuardianSchema,
-    required: [true, "Guardian information must be provided"],
-  },
-  isActive: {
-    type: String,
-    enum: {
-      values: ["active", "inactive"],
-      message: "{VALUE} is not a valid status",
+    name: {
+      type: UserNameSchema,
+      required: [true, "Name property missing please re-check "],
+      trim: true,
     },
-    required: [true, "Active status must be provided"],
+    age: {
+      type: Number,
+      required: [true, "Age must be provided"],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ["male", "female", "others"],
+        message: "{VALUE} is not a valid gender",
+      },
+      required: [
+        true,
+        "Gender must be provided and it should be Male, Female or Others",
+      ],
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: [
+        true,
+        "Email must be provided and it should be a valid email address",
+      ],
+      trim: true,
+      // validate: {
+      //   validator: (value: string) => validator.isEmail(value),
+      //   message: "{VALUE} is not a valid email address",
+      // },
+    },
+    dateOfBirth: {
+      type: String,
+      trim: true,
+    },
+    contactNo: {
+      type: String,
+      required: [true, "ContactNo must be provided"],
+      trim: true,
+    },
+    emergencyContactNumber: {
+      type: String,
+      required: [true, "Emergency Contact Number must be provided"],
+      trim: true,
+    },
+    presentAddress: {
+      type: String,
+      required: [true, "Present Address must be provided"],
+      trim: true,
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, "Permanent Address Mut Be Provided"],
+      trim: true,
+    },
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
+        message: "{VALUE} is not a valid blood group for human",
+      },
+      required: [true, "Blood Group must be a valid blood group for human"],
+    },
+    guardian: {
+      type: GuardianSchema,
+      required: [true, "Guardian information must be provided"],
+    },
+    isActive: {
+      type: String,
+      enum: {
+        values: ["active", "inactive"],
+        message: "{VALUE} is not a valid status",
+      },
+      required: [true, "Active status must be provided"],
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    profileImage: {
+      type: String,
+    },
+    localGuardian: {
+      type: LocalGuardianSchema,
+      required: [true, "LocalGuardian information must be provided"],
+    },
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
+  {
+    // TODO => Optional Properties
+    toJSON: {
+      virtuals: true, // ! It will give you access derived properties into new variable which is not exist.
+    },
   },
-  profileImage: {
-    type: String,
-  },
-  localGuardian: {
-    type: LocalGuardianSchema,
-    required: [true, "LocalGuardian information must be provided"],
-  },
-});
+);
 
 // TODO => pre save middle/hooks ware: will work save method
 StudentSchema.pre("save", async function (next) {
@@ -239,6 +247,10 @@ StudentSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 
   next();
+});
+
+StudentSchema.virtual("fullName").get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 // ** Creating model for schema
 const StudentModel = mongoose.model<StudentInterface.Student>(
