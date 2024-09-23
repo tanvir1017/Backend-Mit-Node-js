@@ -1,7 +1,7 @@
+import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import config from "../../config";
 import * as StudentInterface from "./student.interface";
-
-import validator from "validator";
 
 const UserNameSchema = new mongoose.Schema<StudentInterface.UserName>({
   firstName: {
@@ -9,19 +9,18 @@ const UserNameSchema = new mongoose.Schema<StudentInterface.UserName>({
     required: [true, "First name must be provided"],
     maxlength: [25, "First name must be in the range of 25 letters"],
     trim: true,
-    validate: {
-      validator: function (value: string) {
-        const capitalizeFirstWord =
-          value.charAt(0).toUpperCase() + value.slice(1);
-        return value === capitalizeFirstWord;
-      },
-      message:
-        "{VALUE} is not valid formate for first name, It should be in capitalize",
-    },
+    // validate: {
+    //   validator: function (value: string) {
+    //     const capitalizeFirstWord =
+    //       value.charAt(0).toUpperCase() + value.slice(1);
+    //     return value === capitalizeFirstWord;
+    //   },
+    //   message:
+    //     "{VALUE} is not valid formate for first name, It should be in capitalize",
+    // },
   },
   middleName: {
     type: String,
-    required: [true, "Middle name must be provided"],
     maxlength: [15, "First name must be in the range of 15 letters"],
     trim: true,
   },
@@ -31,11 +30,11 @@ const UserNameSchema = new mongoose.Schema<StudentInterface.UserName>({
     maxlength: [25, "First name must be in the range of 25 letters"],
     trim: true,
     // * validating last name
-    validate: {
-      validator: (value: string) => validator.isAlpha(value),
-      message:
-        "You are adding number to your last name: {VALUE}, which is not valid. Remove number from last name, and try again!",
-    },
+    // validate: {
+    //   validator: (value: string) => validator.isAlpha(value),
+    //   message:
+    //     "You are adding number to your last name: {VALUE}, which is not valid. Remove number from last name, and try again!",
+    // },
   },
 });
 
@@ -104,6 +103,12 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>({
     unique: true,
     trim: true,
   },
+  password: {
+    type: String,
+    required: [true, "Password must be provided"],
+    max: [20, "Password must be in 20 characters long"],
+    trim: true,
+  },
   name: {
     type: UserNameSchema,
     required: [true, "Name property missing please re-check "],
@@ -132,10 +137,10 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>({
       "Email must be provided and it should be a valid email address",
     ],
     trim: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: "{VALUE} is not a valid email address",
-    },
+    // validate: {
+    //   validator: (value: string) => validator.isEmail(value),
+    //   message: "{VALUE} is not a valid email address",
+    // },
   },
   dateOfBirth: {
     type: String,
@@ -181,6 +186,10 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>({
     },
     required: [true, "Active status must be provided"],
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   profileImage: {
     type: String,
   },
@@ -190,6 +199,47 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>({
   },
 });
 
+// TODO => pre save middle/hooks ware: will work save method
+StudentSchema.pre("save", async function (next) {
+  // perform some operations here before saving the document to the database
+
+  // TODO => hashing function to has password
+  const user = this; // currently processable document
+  user.password = await bcrypt.hash(user.password, Number(config.BCRYPT_SALT));
+
+  // calling next function/middleware
+  next();
+});
+
+// TODO => Post save middle/hooks ware: work after save method
+StudentSchema.post("save", function (doc, next) {
+  // TODO => Post save middle/hooks function will have two parameters doc, next
+  doc.password = ""; // making password empty
+  next();
+});
+
+// * Query Middleware
+
+// TODO => modify return data where deleted data should not go to live
+StudentSchema.pre("find", function (next) {
+  // * TODO => The find() method chaining ⛓️‍💥 with the service find() method get ➡️ getAllStudentsFromDB It will check before the service function find() will call and prevent those documents who has isDeleted = true
+  this.find({ isDeleted: { $ne: true } });
+
+  // TODO => Calling the next function to do his work
+  next();
+});
+
+StudentSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  // TODO => Calling the next function to do his work
+  next();
+});
+
+StudentSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+
+  next();
+});
 // ** Creating model for schema
 const StudentModel = mongoose.model<StudentInterface.Student>(
   "Student",

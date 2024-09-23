@@ -23,7 +23,7 @@ type LocalGuardian = {
 // * Student Name
 type UserName = {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 };
 
@@ -31,6 +31,7 @@ type UserName = {
 type Student = {
   id: string;
   name: UserName;
+  password: string;
   age: number;
   gender: "male" | "female" | "others";
   dateOfBirth?: string;
@@ -44,6 +45,7 @@ type Student = {
   localGuardian: LocalGuardian;
   profileImage?: string;
   isActive?: "active" | "inactive";
+  isDeleted: boolean;
 };
 
 export { Guardian, LocalGuardian, Student, UserName };
