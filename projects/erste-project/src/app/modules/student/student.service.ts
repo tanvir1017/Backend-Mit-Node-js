@@ -1,5 +1,5 @@
 import * as StudentInterface from "./student.interface";
-import StudentModel from "./student.schema";
+import StudentModel from "./student.model";
 
 // Creating a new student to DB
 const createStudentIntoDB = async (student: StudentInterface.Student) => {

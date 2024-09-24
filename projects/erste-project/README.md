@@ -1,91 +1,176 @@
-# Software Design
+# PH University System
 
-### Type of software design
+This is a backend project for managing students, faculty, and admins at PH University. It includes authentication, profile management, academic processes, and user management functionalities. The application is built with MongoDB for data storage and provides a set of API endpoints to manage users and academic information.
 
----
+## Table of Contents
 
-### How module system will work in system design
+- [Features](#features)
+  - [Authentication](#authentication)
+  - [Profile Management](#profile-management)
+  - [Academic Process](#academic-process)
+  - [User Management](#user-management)
+- [Data Modeling](#data-modeling)
+  - [User](#user)
+  - [Student](#student)
+  - [Faculty](#faculty)
+  - [Admin](#admin)
+- [API Endpoints](#api-endpoints)
+  - [Users](#users)
+  - [Students](#students)
+  - [Faculty](#faculty)
+  - [Admin](#admin)
+  - [Authentication](#authentication)
+- [Installation](#installation)
+- [Usage](#usage)
 
----
+## Features
 
-### Benefits of modular system from others
+### Authentication
 
----
+- **Student**: Secure login and logout, update password.
+- **Faculty**: Secure login and logout, update password.
+- **Admin**: Secure login and logout, update password.
 
-### Difference between modular system and MVC pattern
+### Profile Management
 
----
+- **Student**: Update profile (limited fields), change password.
+- **Faculty**: Update profile (limited fields), change password.
+- **Admin**: Update profile (limited fields), change password.
 
-### Working with mongoose and typescript for better dev experience
+### Academic Process
 
-interface => schema => model => DB query
+- **Student**:
+  - Enroll in courses.
+  - View class schedule.
+  - View grades.
+  - Access notice board and events.
+- **Faculty**:
+  - Manage student grades.
+  - Access student information.
+- **Admin**:
+  - Manage semesters, courses, offered courses, sections, rooms, buildings.
 
-# Project Folder Structure
+### User Management
 
-```javascript
-├── src
-│    ├── modules
-│    │   ├── auth
-│    │   │   ├── auth.controller.ts
-│    │   │   ├── auth.services.ts
-│    │   │   ├── auth.models.ts
-│    │   │   └── auth.routes.ts
-│    │   ├── user
-│    │   │   ├── user.controllers.ts
-│    │   │   ├── user.services.ts
-│    │   │   ├── user.models.ts
-│    │   │   └── user.routes.ts
-│    │   ├── product
-│    │   │   ├── product.controllers.ts
-│    │   │   ├── product.services.ts
-│    │   │   ├── product.models.ts
-│    │   │   └── product.routes.ts
-│    │   ├── config
-│    │   ├── middlewares
-│    │   ├── utils
-│    │   └── server.ts
-│    │   └── app.ts
-├── tests
-│   ├── unit
-│   └── integration
-├── public
-├── scripts
-├── .env
-├── package.json
-└── README.md
-```
+- **Admin**:
+  - Manage user accounts.
+  - Block/unblock users.
+  - Change user passwords.
 
-## Folder Descriptions
+## Data Modeling
 
-- **src/modules/auth/**: Handles everything related to authentication (login, signup, etc.).
-  - **auth.controller.ts**: Processes incoming HTTP requests for authentication.
-  - **auth.services.ts**: Contains business logic like user verification.
-  - **auth.models.ts**: Defines the schema for user credentials.
-  - **auth.routes.ts**: Routes that handle authentication-related API requests.
-- **src/modules/user/**: Manages user-related functionalities (e.g., profiles, updates).
-  - **user.controllers.ts**: Processes user requests like updating a profile.
-  - **user.services.ts**: Core logic for user management.
-  - **user.models.ts**: User database schema and models.
-  - **user.routes.ts**: API endpoints for user operations.
-- **src/modules/product/**: Manages product-related features (e.g., inventory, listings).
-  - **product.controllers.ts**: Handles product requests like adding or updating a product.
-  - **product.services.ts**: Business logic for managing products.
-  - **product.models.ts**: Defines the product database schema.
-  - **product.routes.ts**: API routes for interacting with products.
-- **config/**: Configuration files (e.g., database, API keys) for different environments.
-- **middlewares/**: Custom middleware (e.g., for authentication, request validation).
-- **utils/**: Reusable utility functions across the application (e.g., helpers, logging).
-- **server.ts**: Main server file to start the application.
-- **app.ts**: Configures and sets up the app (e.g., middleware, routes).
+### User
 
-- **tests/**: Contains test cases to verify application functionality.
-  - **unit/**: Contains unit tests for individual modules.
-  - **integration/**: Integration tests that check how different modules interact together.
-- **public/**: Public files like images or HTML that are served statically.
-- **scripts/**: Automation scripts for deployment or data seeding.
+- `_id`: Auto-generated by MongoDB
+- `Id`: Custom generated user ID
+- `Password`: User password
+- `needPasswordChange`: Boolean, whether the user needs to change their password
+- `Role`: Role of the user (student, faculty, admin)
+- `isDeleted`: Boolean, soft delete indicator
+- `createdAt`: Timestamp of account creation
+- `updatedAt`: Timestamp of the last account update
 
-- **.env**: Configuration for environment-specific variables.
+### Student
 
-- **package.json**: Contains project dependencies and scripts for running the app.
+- `_id`: Auto-generated by MongoDB
+- `Id`: Custom generated student ID
+- `user`: Reference to the `User` collection
+- `Name`: Student name
+- `Email`: Student email
+- `Gender`: Student gender
+- `dateOfbirth`: Student date of birth
+- `ContactNo`: Student contact number
+- `Emergency Contact No`: Emergency contact number
+- `Present Address`: Current address
+- `Permanent Address`: Permanent address
+- `Guardian Information`: Details about the student's guardian
+- `Local Guardian Information`: Details about the student's local guardian (if any)
+- `Academic Department`: Department where the student is enrolled
+- `Profile Image`: URL to the student's profile picture
+- `Status`: Current status (active, inactive, etc.)
+- `isDeleted`: Boolean, soft delete indicator
+- `createdAt`: Timestamp of student profile creation
+- `updatedAt`: Timestamp of the last student profile update
 
-- **README.md**: Documentation for the project.
+### Faculty
+
+- `_id`: Auto-generated by MongoDB
+- `Id`: Custom generated faculty ID
+- `user`: Reference to the `User` collection
+- `Name`: Faculty name
+- `Email`: Faculty email
+- `Designation`: Faculty designation (e.g., Professor)
+- `Gender`: Faculty gender
+- `ContactNo`: Faculty contact number
+- `Emergency Contact No`: Faculty emergency contact number
+- `Present Address`: Faculty current address
+- `Permanent Address`: Faculty permanent address
+- `Profile image`: URL to the faculty's profile picture
+- `Academic Faculty`: Faculty of affiliation
+- `Academic Department`: Department of affiliation
+- `Status`: Current status (active, inactive, etc.)
+- `isDeleted`: Boolean, soft delete indicator
+- `createdAt`: Timestamp of faculty profile creation
+- `updatedAt`: Timestamp of the last faculty profile update
+
+### Admin
+
+- `_id`: Auto-generated by MongoDB
+- `Id`: Custom generated admin ID
+- `user`: Reference to the `User` collection
+- `Name`: Admin name
+- `Email`: Admin email
+- `Designation`: Admin designation
+- `Gender`: Admin gender
+- `ContactNo`: Admin contact number
+- `Emergency Contact No`: Admin emergency contact number
+- `Present Address`: Admin current address
+- `Permanent Address`: Admin permanent address
+- `Profile image`: URL to the admin's profile picture
+- `Management Department`: Department where the admin manages
+- `Status`: Current status (active, inactive, etc.)
+- `isDeleted`: Boolean, soft delete indicator
+- `createdAt`: Timestamp of admin profile creation
+- `updatedAt`: Timestamp of the last admin profile update
+
+## API Endpoints
+
+### Users
+
+- **Create a Student**: `POST /users/create-student`
+- **Create a Faculty**: `POST /users/create-faculty`
+- **Create an Admin**: `POST /users/create-admin`
+
+### Students
+
+- **Get All Students**: `GET /students`
+- **Get Student by ID**: `GET /student/:id`
+- **Update Student by ID**: `PATCH /student/:id/update`
+- **Delete Student by ID**: `DELETE /student/:id/delete`
+- **Get My Profile**: `GET /student/my-profile`
+
+### Faculty
+
+- **Get All Faculties**: `GET /faculties`
+- **Get Faculty by ID**: `GET /faculty/:id`
+- **Update Faculty by ID**: `PATCH /faculty/:id/update`
+- **Delete Faculty by ID**: `DELETE /faculty/:id/delete`
+- **Get My Profile**: `GET /faculty/my-profile`
+
+### Admin
+
+- **Get All Admins**: `GET /admins`
+- **Get Admin by ID**: `GET /admin/:id`
+- **Update Admin by ID**: `PATCH /admin/:id/update`
+- **Delete Admin by ID**: `DELETE /admin/:id/delete`
+- **Get My Profile**: `GET /admin/my-profile`
+
+### Authentication
+
+- **Login**: `POST /auth/login`
+- **Refresh Token**: `POST /auth/refresh-token`
+- **Change Password**: `PATCH /auth/change-password`
+- **Forgot Password**: `POST /auth/forget-password`
+- **Reset Password**: `POST /auth/reset-password`
+
+## ER-Diagram `In-progress 😑`
