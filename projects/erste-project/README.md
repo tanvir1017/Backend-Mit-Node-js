@@ -1,6 +1,6 @@
-# PH University System
+# University Management System
 
-This is a backend project for managing students, faculty, and admins at PH University. It includes authentication, profile management, academic processes, and user management functionalities. The application is built with MongoDB for data storage and provides a set of API endpoints to manage users and academic information.
+This is a backend project for managing students, faculty, and admins at University Management. It includes authentication, profile management, academic processes, and user management functionalities. The application is built with MongoDB for data storage and provides a set of API endpoints to manage users and academic information.
 
 ## Table of Contents
 
