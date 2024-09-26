@@ -1,14 +1,6 @@
 import * as StudentInterface from "./student.interface";
 import StudentModel from "./student.model";
 
-// Creating a new student to DB
-const createStudentIntoDB = async (student: StudentInterface.Student) => {
-  //const result = await StudentModel.create(student); // create student data
-  const modeInstance = new StudentModel(student);
-  const result = await modeInstance.save(); // save student data
-  return result;
-};
-
 // Get all students
 const getAllStudentsFromDB = async () => {
   const result = await StudentModel.find(); // create student data
@@ -47,7 +39,6 @@ const updateStudentFromDB = async <T extends StudentInterface.Student>(
 };
 
 export const studentService = {
-  createStudentIntoDB,
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,

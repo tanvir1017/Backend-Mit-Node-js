@@ -1,7 +1,9 @@
 // ********** IMPORTING PACKAGES**********************
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
-import { StudentsRoute } from "./app/modules/student/student.route";
+import globalErrorHandler from "./app/middleware/globalErrorHandler";
+import notFound from "./app/middleware/notFound";
+import routes from "./app/routes";
 
 // ** making app variable and store it into express functions
 const app: Application = express();
@@ -15,10 +17,13 @@ app.get("/", async (__req: Request, res: Response) => {
   res.status(200).json({ message: "Hello from the server!" });
 });
 
-// * App routes distributing from this application
+// TODO => Using routes for whole application
+app.use("/api/v1", routes);
 
-// TODO => create student into DB
+// TODO => Global error handler Function
+app.use(globalErrorHandler);
 
-app.use("/api/v1/student", StudentsRoute);
+// TODO  => Not Found handler route
+app.use(notFound);
 
 export default app;

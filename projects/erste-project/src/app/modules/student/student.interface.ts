@@ -1,9 +1,10 @@
 // import { Schema, model, connect } from "mongoose";
+import { Types } from "mongoose";
 
 // * How **
 
 // * Guardian Type**
-type Guardian = {
+type TGuardian = {
   fatherName: string;
   motherName: string;
   fatherOccupation: string;
@@ -13,7 +14,7 @@ type Guardian = {
 };
 
 // * Local Guardian**
-type LocalGuardian = {
+type TLocalGuardian = {
   name: string;
   occupation: string;
   contactNo: string;
@@ -21,16 +22,17 @@ type LocalGuardian = {
 };
 
 // * Student Name
-type UserName = {
+type TUserName = {
   firstName: string;
   middleName?: string;
   lastName: string;
 };
 
 // * User types **
-type Student = {
+type TStudent = {
   id: string;
-  name: UserName;
+  user: Types.ObjectId;
+  name: TUserName;
   password: string;
   age: number;
   gender: "male" | "female" | "others";
@@ -41,11 +43,10 @@ type Student = {
   presentAddress: string;
   permanentAddress: string;
   bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
-  guardian: Guardian;
-  localGuardian: LocalGuardian;
+  guardian: TGuardian;
+  localGuardian: TLocalGuardian;
   profileImage?: string;
-  isActive?: "active" | "inactive";
   isDeleted: boolean;
 };
 
-export { Guardian, LocalGuardian, Student, UserName };
+export { TGuardian, TLocalGuardian, TStudent, TUserName };

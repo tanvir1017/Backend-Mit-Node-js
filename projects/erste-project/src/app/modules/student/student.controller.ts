@@ -1,112 +1,104 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import sendResponse from "../../utils/sendResponse";
 import { studentService } from "./student.service";
-import StudentValidationSchemaZOD from "./student.validation";
-
-// TODO =>  Student creation controller
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: studentData } = await req.body;
-
-    // creating schema validation using zod
-    const bodyDataValidationParser =
-      StudentValidationSchemaZOD.parse(studentData);
-
-    const result = await studentService.createStudentIntoDB(
-      bodyDataValidationParser,
-    );
-
-    // Send response
-    res.status(201).json({
-      success: true,
-      message: "Student created successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: "something went wrong!!",
-      error: error.message,
-    });
-  }
-};
 
 // TODO =>  Student fetch controller From DB
-const getAllStudent = async (__req: Request, res: Response) => {
+const getAllStudent = async (
+  __req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await studentService.getAllStudentsFromDB();
-    res.status(200).json({
+    sendResponse(res, {
+      statuscode: 200,
       success: true,
       message: "All students fetched successfully",
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: "something went wrong!!",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 // TODO =>  Get single student
 
-const getSingleStudentById = async (req: Request, res: Response) => {
+const getSingleStudentById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { id } = req.params;
   const result = await studentService.getSingleStudentFromDB(id);
   if (!result) {
-    return res.status(404).json({
+    sendResponse(res, {
+      statuscode: 404,
       success: false,
-      message: "Student not found",
+      message: "Student not found by this id",
+      data: {},
     });
   }
-  res.status(200).json({
+
+  sendResponse(res, {
+    statuscode: 400,
     success: true,
     message: "Student fetched successfully",
     data: result,
   });
   try {
     const { id } = req.body.params;
+
+    // TODO => checking id is available or not
     if (id) {
       const result = await studentService.getSingleStudentFromDB(id);
+
+      // TODO => check if data found by this id or id is correct
       if (!result) {
-        res.status(404).send({
+        sendResponse(res, {
+          statuscode: 404,
           success: false,
           message: "Student not found by this id",
-          data: {},
+          data: null,
         });
       }
 
-      res.status(200).json({
+      // TODO => If data found by this id then:
+      sendResponse(res, {
+        statuscode: 200,
         success: true,
         message: `Student found by this specific id: ${id}`,
         data: result,
       });
     }
 
-    res.status(404).json({
+    // TODO => If id is not given or Id not found, Then:
+    sendResponse(res, {
+      statuscode: 404,
       success: false,
       message: "Id not found from client",
-      data: {},
+      data: null,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: "something went wrong!!",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 // TODO =>  Delete single student
-const deleteStudentById = async (req: Request, res: Response) => {
+const deleteStudentById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params;
 
     // TODO => checking id params
     if (!studentId) {
-      return res.status(400).json({
+      sendResponse(res, {
+        statuscode: 400,
         success: false,
         message: "Student id is required",
+        data: null,
       });
     }
 
@@ -114,34 +106,42 @@ const deleteStudentById = async (req: Request, res: Response) => {
 
     // TODO => checking the result if id is available or not
     if (!result) {
-      return res.status(404).json({
+      sendResponse(res, {
+        statuscode: 404,
         success: false,
         message: "Student not found",
+        data: null,
       });
     }
 
-    return res.status(200).json({
+    // TODO => If result is not available
+    sendResponse(res, {
+      statuscode: 200,
       success: true,
       message: "Student deleted successfully",
       data: null,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: "something went wrong",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const updateStudent = async (req: Request, res: Response) => {
+const updateStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params;
     const { studentUpdateAbleInfo } = req.body;
+
+    // TODO => checking id is available or not
     if (!studentId) {
-      return res.status(400).json({
+      sendResponse(res, {
+        statuscode: 400,
         success: false,
         message: "Student id is required",
+        data: null,
       });
     }
 
@@ -149,22 +149,18 @@ const updateStudent = async (req: Request, res: Response) => {
       studentId,
       studentUpdateAbleInfo,
     );
-    res.status(200).json({
+    sendResponse(res, {
+      statuscode: 200,
       success: true,
       message: "Student updated successfully",
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: "something went wrong",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const StudentController = {
-  createStudent,
   getAllStudent,
   getSingleStudentById,
   deleteStudentById,

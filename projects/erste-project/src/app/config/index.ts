@@ -8,4 +8,5 @@ export default {
   PORT: process.env.PORT,
   ATLAS_URI: process.env.DATABASE_URL,
   BCRYPT_SALT: process.env.BCRYPT_SALT_ROUNDS,
+  DEFAULT_PASS: process.env.DEFAULT_PASS,
 };

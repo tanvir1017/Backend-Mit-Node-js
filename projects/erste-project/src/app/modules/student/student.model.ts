@@ -1,9 +1,7 @@
-import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import config from "../../config";
 import * as StudentInterface from "./student.interface";
 
-const UserNameSchema = new mongoose.Schema<StudentInterface.UserName>({
+const UserNameSchema = new mongoose.Schema<StudentInterface.TUserName>({
   firstName: {
     type: String,
     required: [true, "First name must be provided"],
@@ -38,7 +36,7 @@ const UserNameSchema = new mongoose.Schema<StudentInterface.UserName>({
   },
 });
 
-const GuardianSchema = new mongoose.Schema<StudentInterface.Guardian>({
+const GuardianSchema = new mongoose.Schema<StudentInterface.TGuardian>({
   fatherName: {
     type: String,
     required: [true, "First(Guardian ) name is required"],
@@ -71,8 +69,8 @@ const GuardianSchema = new mongoose.Schema<StudentInterface.Guardian>({
   },
 });
 
-const LocalGuardianSchema = new mongoose.Schema<StudentInterface.LocalGuardian>(
-  {
+const LocalGuardianSchema =
+  new mongoose.Schema<StudentInterface.TLocalGuardian>({
     name: {
       type: String,
       required: [true, "Local Guardian name is required"],
@@ -93,10 +91,9 @@ const LocalGuardianSchema = new mongoose.Schema<StudentInterface.LocalGuardian>(
       required: [true, "Local Guardian address is required"],
       trim: true,
     },
-  },
-);
+  });
 
-const StudentSchema = new mongoose.Schema<StudentInterface.Student>(
+const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
   {
     id: {
       type: String,
@@ -104,11 +101,11 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>(
       unique: true,
       trim: true,
     },
-    password: {
-      type: String,
-      required: [true, "Password must be provided"],
-      max: [20, "Password must be in 20 characters long"],
-      trim: true,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, "User must be provided"],
+      unique: true,
+      ref: "User",
     },
     name: {
       type: UserNameSchema,
@@ -138,10 +135,6 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>(
         "Email must be provided and it should be a valid email address",
       ],
       trim: true,
-      // validate: {
-      //   validator: (value: string) => validator.isEmail(value),
-      //   message: "{VALUE} is not a valid email address",
-      // },
     },
     dateOfBirth: {
       type: String,
@@ -179,14 +172,6 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>(
       type: GuardianSchema,
       required: [true, "Guardian information must be provided"],
     },
-    isActive: {
-      type: String,
-      enum: {
-        values: ["active", "inactive"],
-        message: "{VALUE} is not a valid status",
-      },
-      required: [true, "Active status must be provided"],
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -206,25 +191,6 @@ const StudentSchema = new mongoose.Schema<StudentInterface.Student>(
     },
   },
 );
-
-// TODO => pre save middle/hooks ware: will work save method
-StudentSchema.pre("save", async function (next) {
-  // perform some operations here before saving the document to the database
-
-  // TODO => hashing function to has password
-  const user = this; // currently processable document
-  user.password = await bcrypt.hash(user.password, Number(config.BCRYPT_SALT));
-
-  // calling next function/middleware
-  next();
-});
-
-// TODO => Post save middle/hooks ware: work after save method
-StudentSchema.post("save", function (doc, next) {
-  // TODO => Post save middle/hooks function will have two parameters doc, next
-  doc.password = ""; // making password empty
-  next();
-});
 
 // * Query Middleware
 
@@ -253,7 +219,7 @@ StudentSchema.virtual("fullName").get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 // ** Creating model for schema
-const StudentModel = mongoose.model<StudentInterface.Student>(
+const StudentModel = mongoose.model<StudentInterface.TStudent>(
   "Student",
   StudentSchema,
 );
