@@ -36,7 +36,7 @@ type TStudent = {
   password: string;
   age: number;
   gender: "male" | "female" | "others";
-  dateOfBirth?: string;
+  dateOfBirth?: Date;
   email: string;
   contactNo: string;
   emergencyContactNumber: string;

@@ -1,14 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
+import asyncHandler from "../../utils/asyncHandler";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 
-// TODO =>  Student creation controller
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+// TODO   =>  Student creation controller
+const createStudent = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { password, student: studentData } = req.body;
 
     const result = await UserServices.createStudentIntoDB(
@@ -18,15 +16,13 @@ const createStudent = async (
 
     // Send response
     sendResponse(res, {
-      statuscode: 201,
+      statuscode: httpStatus.CREATED,
       success: true,
       message: "Student created successfully",
       data: result,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+  },
+);
 
 export const UserControllers = {
   createStudent,

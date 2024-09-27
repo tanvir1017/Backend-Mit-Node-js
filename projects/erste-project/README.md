@@ -174,3 +174,12 @@ This is a backend project for managing students, faculty, and admins at Universi
 - **Reset Password**: `POST /auth/reset-password`
 
 ## ER-Diagram `In-progress 😑`
+
+## Admin Generated ID For Student System
+
+> `Year` + `SemesterCode` + `4 Digits Code` → _**2024020001**_
+>
+> > - Semester Code List
+> > - 01 → Autumn
+> > - 02 → Summer
+> > - 03 → Fall

@@ -1,51 +1,28 @@
 import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
+import asyncHandler from "../../utils/asyncHandler";
 import sendResponse from "../../utils/sendResponse";
 import { studentService } from "./student.service";
 
 // TODO =>  Student fetch controller From DB
-const getAllStudent = async (
-  __req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+const getAllStudent = asyncHandler(
+  async (__req: Request, res: Response, next: NextFunction) => {
     const result = await studentService.getAllStudentsFromDB();
+
+    // Sending response to the client
     sendResponse(res, {
       statuscode: 200,
       success: true,
       message: "All students fetched successfully",
       data: result,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+  },
+);
 
 // TODO =>  Get single student
 
-const getSingleStudentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { id } = req.params;
-  const result = await studentService.getSingleStudentFromDB(id);
-  if (!result) {
-    sendResponse(res, {
-      statuscode: 404,
-      success: false,
-      message: "Student not found by this id",
-      data: {},
-    });
-  }
-
-  sendResponse(res, {
-    statuscode: 400,
-    success: true,
-    message: "Student fetched successfully",
-    data: result,
-  });
-  try {
+const getSingleStudentById = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.body.params;
 
     // TODO => checking id is available or not
@@ -55,7 +32,7 @@ const getSingleStudentById = async (
       // TODO => check if data found by this id or id is correct
       if (!result) {
         sendResponse(res, {
-          statuscode: 404,
+          statuscode: httpStatus.NOT_FOUND,
           success: false,
           message: "Student not found by this id",
           data: null,
@@ -64,7 +41,7 @@ const getSingleStudentById = async (
 
       // TODO => If data found by this id then:
       sendResponse(res, {
-        statuscode: 200,
+        statuscode: httpStatus.OK,
         success: true,
         message: `Student found by this specific id: ${id}`,
         data: result,
@@ -73,29 +50,23 @@ const getSingleStudentById = async (
 
     // TODO => If id is not given or Id not found, Then:
     sendResponse(res, {
-      statuscode: 404,
+      statuscode: httpStatus.NOT_FOUND,
       success: false,
       message: "Id not found from client",
       data: null,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+  },
+);
 
 // TODO =>  Delete single student
-const deleteStudentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+const deleteStudentById = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { studentId } = req.params;
 
     // TODO => checking id params
     if (!studentId) {
       sendResponse(res, {
-        statuscode: 400,
+        statuscode: httpStatus.NOT_ACCEPTABLE,
         success: false,
         message: "Student id is required",
         data: null,
@@ -107,7 +78,7 @@ const deleteStudentById = async (
     // TODO => checking the result if id is available or not
     if (!result) {
       sendResponse(res, {
-        statuscode: 404,
+        statuscode: httpStatus.NOT_FOUND,
         success: false,
         message: "Student not found",
         data: null,
@@ -116,29 +87,23 @@ const deleteStudentById = async (
 
     // TODO => If result is not available
     sendResponse(res, {
-      statuscode: 200,
+      statuscode: httpStatus.OK,
       success: true,
       message: "Student deleted successfully",
       data: null,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+  },
+);
 
-const updateStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+const updateStudent = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { studentId } = req.params;
     const { studentUpdateAbleInfo } = req.body;
 
     // TODO => checking id is available or not
     if (!studentId) {
       sendResponse(res, {
-        statuscode: 400,
+        statuscode: httpStatus.NOT_ACCEPTABLE,
         success: false,
         message: "Student id is required",
         data: null,
@@ -150,15 +115,13 @@ const updateStudent = async (
       studentUpdateAbleInfo,
     );
     sendResponse(res, {
-      statuscode: 200,
+      statuscode: httpStatus.OK,
       success: true,
       message: "Student updated successfully",
       data: result,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+  },
+);
 
 export const StudentController = {
   getAllStudent,

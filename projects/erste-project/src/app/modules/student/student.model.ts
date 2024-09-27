@@ -137,8 +137,7 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
       trim: true,
     },
     dateOfBirth: {
-      type: String,
-      trim: true,
+      type: Date,
     },
     contactNo: {
       type: String,
