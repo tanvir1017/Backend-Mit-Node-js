@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import * as StudentInterface from "./student.interface";
+import * as StudentInterface from "../interface/student.interface";
 
 const UserNameSchema = new mongoose.Schema<StudentInterface.TUserName>({
   firstName: {
@@ -177,6 +177,10 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
     },
     profileImage: {
       type: String,
+    },
+    admissionSemester: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AcademicSemester ",
     },
     localGuardian: {
       type: LocalGuardianSchema,

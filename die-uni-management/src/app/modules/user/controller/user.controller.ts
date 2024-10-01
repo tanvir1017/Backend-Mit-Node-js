@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
-import asyncHandler from "../../utils/asyncHandler";
-import sendResponse from "../../utils/sendResponse";
-import { UserServices } from "./user.service";
+import asyncHandler from "../../../utils/asyncHandler";
+import sendResponse from "../../../utils/sendResponse";
+import { UserServices } from "../service/user.service";
 
 // TODO   =>  Student creation controller
 const createStudent = asyncHandler(

@@ -1,5 +1,5 @@
-import * as StudentInterface from "./student.interface";
-import StudentModel from "./student.model";
+import * as StudentInterface from "../interface/student.interface";
+import StudentModel from "../model/student.model";
 
 // Get all students
 const getAllStudentsFromDB = async () => {
@@ -28,7 +28,7 @@ const deleteStudentFromDB = async (id: string) => {
  * @param {string} id
  * @param {object} fieldAndValue The object from req.body
  */
-const updateStudentFromDB = async <T extends StudentInterface.Student>(
+const updateStudentFromDB = async <T extends StudentInterface.TStudent>(
   id: string,
   fieldAndValue: T,
 ) => {

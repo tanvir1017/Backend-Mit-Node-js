@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import mongoose, { model } from "mongoose";
-import config from "../../config";
-import * as TUserInterface from "./user.interface";
+
+import config from "../../../config";
+import * as TUserInterface from "../interface/user.interface";
 
 const UserSchema = new mongoose.Schema<TUserInterface.TUser>(
   {

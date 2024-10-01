@@ -1,8 +1,8 @@
-import config from "../../config";
-import * as StudentInterface from "../student/student.interface";
-import StudentModel from "../student/student.model";
-import { TUser } from "./user.interface";
-import { User } from "./user.model";
+import config from "../../../config";
+import * as StudentInterface from "../../student/interface/student.interface";
+import StudentModel from "../../student/model/student.model";
+import { TUser } from "../interface/user.interface";
+import { User } from "../model/user.model";
 
 // TODO => Creating a new student to DB
 const createStudentIntoDB = async (
