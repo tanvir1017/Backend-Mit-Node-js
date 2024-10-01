@@ -51,7 +51,7 @@ const createStudentSchemaValidation = z.object({
         .string()
         .email("Email must be a valid email address. ex: you@gmail.com")
         .trim(),
-      dateOfBirth: z.date().optional(),
+      dateOfBirth: z.string(),
       contactNo: z.string().trim(),
       emergencyContactNumber: z.string().trim(),
       presentAddress: z.string().trim(),

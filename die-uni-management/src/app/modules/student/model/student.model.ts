@@ -99,7 +99,6 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
       type: String,
       required: [true, "Id must be provided"],
       unique: true,
-      trim: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -129,15 +128,15 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
     },
     email: {
       type: String,
-      unique: true,
       required: [
         true,
         "Email must be provided and it should be a valid email address",
       ],
-      trim: true,
+      unique: true,
     },
     dateOfBirth: {
-      type: Date,
+      type: String,
+      required: true,
     },
     contactNo: {
       type: String,
