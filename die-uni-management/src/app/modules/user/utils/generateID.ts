@@ -53,6 +53,5 @@ export const generatedID = async (payload: TAcademicSemester) => {
 
   idAfterIncrement = `${payload.year}${payload.code}${idAfterIncrement}`;
 
-  // console.log("🚀 ~ generatedID ~ idAfterIncrement:", idAfterIncrement); // 👉 203002 ⭕ 0001 => ❌ 2030 03 0004
   return idAfterIncrement;
 };
