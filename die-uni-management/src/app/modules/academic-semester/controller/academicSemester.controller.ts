@@ -54,7 +54,6 @@ const getallAcademicSemesters = asyncHandler(
 const getSingleAcademicSemester = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { semesterID } = req.params;
-    console.log(semesterID);
     if (!semesterID) {
       sendResponse(res, {
         statuscode: httpStatus.NOT_FOUND,
@@ -78,8 +77,38 @@ const getSingleAcademicSemester = asyncHandler(
   },
 );
 
+// TODO: update Data for Academic Semester
+const updateSingleAcademicSemester = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { semesterID } = req.params;
+    const academicSemesterData = req.body;
+
+    if (!semesterID) {
+      sendResponse(res, {
+        statuscode: httpStatus.NOT_FOUND,
+        success: false,
+        message: "Please provide a valid semester ID",
+        data: null,
+      });
+    }
+
+    const result =
+      await AcademicSemesterServices.updateSingleAcademicSemestersFromDB(
+        semesterID,
+        academicSemesterData,
+      );
+    sendResponse(res, {
+      statuscode: httpStatus.OK,
+      success: true,
+      message: "Academic Semester data updated successfully",
+      data: result,
+    });
+  },
+);
+
 export const AcademicSemesterControllers = {
   createAcademicSemester,
   getallAcademicSemesters,
   getSingleAcademicSemester,
+  updateSingleAcademicSemester,
 };

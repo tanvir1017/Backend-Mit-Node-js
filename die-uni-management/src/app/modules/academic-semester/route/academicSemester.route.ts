@@ -22,4 +22,13 @@ router
   .route("/:semesterID")
   .get(AcademicSemesterControllers.getSingleAcademicSemester);
 
+// TODO => update academic semester route
+router.route("/:semesterID/update-academic-semester").patch(
+  // validator middleware called sanitizedClient
+  sanitizeClientDataViaZod(
+    AcademicSemesterValidationZOD.updateAcademicSemesterValidation,
+  ),
+  AcademicSemesterControllers.updateSingleAcademicSemester,
+);
+
 export const AcademicSemesterRoutes = router;

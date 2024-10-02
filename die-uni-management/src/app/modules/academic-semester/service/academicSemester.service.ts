@@ -25,11 +25,35 @@ const getAllAcademicSemestersFromDB = async () => {
 // TODO => get single academic semester by ID Service
 const getSingleAcademicSemestersFromDB = async (payload: string) => {
   const result = await AcademicSemester.findOne({ _id: payload });
+  return result;
+};
 
+// TODO => get single academic semester by ID Service
+const updateSingleAcademicSemestersFromDB = async (
+  id: string,
+  // payload: z.infer<
+  //   typeof AcademicSemesterValidationZOD.updateAcademicSemesterValidation
+  // >,
+  payload: Partial<TAcademicSemester>,
+) => {
+  if (
+    payload.name &&
+    payload.code &&
+    academicSemesterNameWithCodeMapper[payload.name] !== payload.code
+  ) {
+    throw new Error(
+      `${payload.name} has invalid semester code: ${payload.code}`,
+    );
+  }
+
+  const result = await AcademicSemester.findOneAndUpdate({ _id: id }, payload, {
+    new: true, // for returning modified result
+  });
   return result;
 };
 export const AcademicSemesterServices = {
   createAcademicSemesterIntoDB,
   getAllAcademicSemestersFromDB,
   getSingleAcademicSemestersFromDB,
+  updateSingleAcademicSemestersFromDB,
 };
