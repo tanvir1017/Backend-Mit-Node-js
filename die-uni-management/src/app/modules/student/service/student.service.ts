@@ -3,13 +3,21 @@ import StudentModel from "../model/student.model";
 
 // Get all students
 const getAllStudentsFromDB = async () => {
-  const result = await StudentModel.find(); // create student data
+  const result = await StudentModel.find({}); // create student data
   return result;
 };
 
 // get single student
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await StudentModel.findOne({ id });
+  const result = await StudentModel.findById(id)
+    .populate("user")
+    .populate("admissionSemester")
+    .populate({
+      path: "academicDepartment",
+      populate: {
+        path: "academicFaculty",
+      },
+    });
   /*const result = await StudentModel.aggregate([
     //{ $match: { isDeleted: { $ne: true } } },
     { $match: { id: id } },

@@ -7,7 +7,7 @@ const router = Router();
 router.route("/").get(StudentController.getAllStudent); // Type 1 that I like
 
 // get single student by id route
-router.route("/:id").get(StudentController.getSingleStudentById); // Type 1 that I like
+router.route("/:studentId").get(StudentController.getSingleStudentById); // Type 1 that I like
 
 // delete single student by id
 router

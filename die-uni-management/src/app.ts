@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 //** Routing
-app.get("/", async (__req: Request, res: Response) => {
+app.get("/api/v1/check", async (__req: Request, res: Response) => {
   res.status(200).json({ message: "Hello from the server!" });
 });
 

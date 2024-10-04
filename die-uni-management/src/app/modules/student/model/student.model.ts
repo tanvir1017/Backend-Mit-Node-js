@@ -179,7 +179,11 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
     },
     admissionSemester: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AcademicSemester ",
+      ref: "AcademicSemester",
+    },
+    academicDepartment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AcademicDepartment",
     },
     localGuardian: {
       type: LocalGuardianSchema,

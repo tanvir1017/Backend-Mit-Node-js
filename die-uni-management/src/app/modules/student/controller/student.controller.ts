@@ -5,29 +5,27 @@ import sendResponse from "../../../utils/sendResponse";
 import { studentService } from "../service/student.service";
 
 // TODO =>  Student fetch controller From DB
-const getAllStudent = asyncHandler(
-  async (__req: Request, res: Response, next: NextFunction) => {
-    const result = await studentService.getAllStudentsFromDB();
+const getAllStudent = asyncHandler(async (__req, res) => {
+  const result = await studentService.getAllStudentsFromDB();
 
-    // Sending response to the client
-    sendResponse(res, {
-      statuscode: 200,
-      success: true,
-      message: "All students fetched successfully",
-      data: result,
-    });
-  },
-);
+  // Sending response to the client
+  sendResponse(res, {
+    statuscode: 200,
+    success: true,
+    message: "All students fetched successfully",
+    data: result,
+  });
+});
 
 // TODO =>  Get single student
 
 const getSingleStudentById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.body.params;
+  async (req: Request, res: Response) => {
+    const { studentId } = req.params;
 
     // TODO => checking id is available or not
-    if (id) {
-      const result = await studentService.getSingleStudentFromDB(id);
+    if (studentId) {
+      const result = await studentService.getSingleStudentFromDB(studentId);
 
       // TODO => check if data found by this id or id is correct
       if (!result) {
@@ -43,7 +41,7 @@ const getSingleStudentById = asyncHandler(
       sendResponse(res, {
         statuscode: httpStatus.OK,
         success: true,
-        message: `Student found by this specific id: ${id}`,
+        message: `Student found by this specific id: ${studentId}`,
         data: result,
       });
     }
