@@ -119,11 +119,10 @@ const updateStudentFromDB = async (
   }
   console.log("🚀 ~ modifiedData:", modifiedData);
 
-  const result = await StudentModel.findOneAndUpdate(
-    { id },
-    { modifiedData },
-    //{ new: true, runValidators: true },
-  );
+  const result = await StudentModel.findOneAndUpdate({ id }, modifiedData, {
+    new: true,
+    runValidators: true,
+  });
   return result;
 };
 
