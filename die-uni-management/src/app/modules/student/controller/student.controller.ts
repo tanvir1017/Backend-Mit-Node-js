@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import httpStatus from "http-status";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
@@ -57,69 +57,65 @@ const getSingleStudentById = asyncHandler(
 );
 
 // TODO =>  Delete single student
-const deleteStudentById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { studentId } = req.params;
+const deleteStudentById = asyncHandler(async (req, res) => {
+  const { studentId } = req.params;
 
-    // TODO => checking id params
-    if (!studentId) {
-      sendResponse(res, {
-        statuscode: httpStatus.NOT_ACCEPTABLE,
-        success: false,
-        message: "Student id is required",
-        data: null,
-      });
-    }
-
-    const result = await studentService.deleteStudentFromDB(studentId);
-
-    // TODO => checking the result if id is available or not
-    if (!result) {
-      sendResponse(res, {
-        statuscode: httpStatus.NOT_FOUND,
-        success: false,
-        message: "Student not found",
-        data: null,
-      });
-    }
-
-    // TODO => If result is not available
+  // TODO => checking id params
+  if (!studentId) {
     sendResponse(res, {
-      statuscode: httpStatus.OK,
-      success: true,
-      message: "Student deleted successfully",
+      statuscode: httpStatus.NOT_ACCEPTABLE,
+      success: false,
+      message: "Student id is required",
       data: null,
     });
-  },
-);
+  }
 
-const updateStudent = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { studentId } = req.params;
-    const { studentUpdateAbleInfo } = req.body;
+  const result = await studentService.deleteStudentFromDB(studentId);
 
-    // TODO => checking id is available or not
-    if (!studentId) {
-      sendResponse(res, {
-        statuscode: httpStatus.NOT_ACCEPTABLE,
-        success: false,
-        message: "Student id is required",
-        data: null,
-      });
-    }
-
-    const result = await studentService.updateStudentFromDB(
-      studentId,
-      studentUpdateAbleInfo,
-    );
+  // TODO => checking the result if id is available or not
+  if (!result) {
     sendResponse(res, {
-      statuscode: httpStatus.OK,
-      success: true,
-      message: "Student updated successfully",
-      data: result,
+      statuscode: httpStatus.NOT_FOUND,
+      success: false,
+      message: "Student not found",
+      data: null,
     });
-  },
-);
+  }
+
+  // TODO => If result is successfully deleted
+  sendResponse(res, {
+    statuscode: httpStatus.OK,
+    success: true,
+    message: "Student deleted successfully",
+    data: null,
+  });
+});
+
+const updateStudent = asyncHandler(async (req, res) => {
+  const { studentId } = req.params;
+  const { studentUpdateAbleInfo } = req.body;
+
+  // TODO => checking id is available or not
+  if (!studentId) {
+    sendResponse(res, {
+      statuscode: httpStatus.NOT_ACCEPTABLE,
+      success: false,
+      message: "Student id is required",
+      data: null,
+    });
+  }
+
+  const result = await studentService.updateStudentFromDB(
+    studentId,
+    studentUpdateAbleInfo,
+  );
+  sendResponse(res, {
+    statuscode: httpStatus.OK,
+    success: true,
+    message: "Student updated successfully",
+    data: result,
+  });
+});
 
 export const StudentController = {
   getAllStudent,

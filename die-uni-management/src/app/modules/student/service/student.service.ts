@@ -1,3 +1,7 @@
+import httpStatus from "http-status";
+import mongoose from "mongoose";
+import AppError from "../../../errors/appError";
+import { User } from "../../user/model/user.model";
 import * as StudentInterface from "../interface/student.interface";
 import StudentModel from "../model/student.model";
 
@@ -27,8 +31,51 @@ const getSingleStudentFromDB = async (id: string) => {
 
 // TODO: delete student from db
 const deleteStudentFromDB = async (id: string) => {
-  const result = await StudentModel.updateOne({ id }, { isDeleted: true });
-  return result;
+  // while we'll use write operation in two collection at a time we'll use Transaction Rollback
+
+  //TODO =>  start session a session
+  const session = await mongoose.startSession();
+
+  // TODO => wrap rest of the functionality inside the try catch block
+  try {
+    // TODO => Now start the session transaction
+    session.startTransaction();
+    const deletedUser = await User.findOneAndUpdate(
+      { id },
+      { isDeleted: true },
+      {
+        new: true,
+        session,
+      },
+    );
+
+    if (!deletedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, "failed to delete user");
+    }
+
+    const deletedStudent = await StudentModel.findOneAndUpdate(
+      { id },
+      { isDeleted: true },
+      { new: true, session },
+    );
+    if (!deletedStudent) {
+      throw new AppError(httpStatus.BAD_REQUEST, "failed to delete student");
+    }
+
+    // TODO =>  commit transaction
+    await session.commitTransaction();
+
+    // TODO =>  end transaction
+    await session.endSession();
+
+    return deletedStudent;
+  } catch (error) {
+    // TODO => abort transaction if get any error
+    await session.abortTransaction();
+
+    // TODO => end transaction
+    await session.endSession();
+  }
 };
 
 /**
