@@ -1,4 +1,7 @@
+import httpStatus from "http-status";
+import mongoose from "mongoose";
 import config from "../../../config";
+import AppError from "../../../errors/appError";
 import { TAcademicSemester } from "../../academic-semester/interface/academicSemester.interface";
 import { AcademicSemester } from "../../academic-semester/model/academicSemester.model";
 import * as StudentInterface from "../../student/interface/student.interface";
@@ -27,18 +30,50 @@ const createStudentIntoDB = async (
     payload.admissionSemester,
   )) as TAcademicSemester;
 
-  userData.id = await generatedID(academicSemesterDetails);
+  // Transactions and Rollback
 
-  //create a user
-  const newUser = await User.create(userData); // create student data
+  // TODO =>  Make isolated environments by creating new sessions
 
-  if (Object.keys(newUser).length) {
+  const session = await mongoose.startSession();
+
+  // make everything inside try catch for taking care of errors or falling transactions
+  try {
+    // TODO => start transaction session
+    session.startTransaction();
+
+    userData.id = await generatedID(academicSemesterDetails);
+
+    // TODO => creating user with session | Transaction 02
+    const newUser = await User.create([userData], { session }); // create student data
+
+    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Failed to create user");
+    }
+
     // set id and user = _id to student object
-    payload.id = newUser.id; // embedded id
-    payload.user = newUser._id; // ref _Id
+    payload.id = newUser[0].id; // embedded id
+    payload.user = newUser[0]._id; // ref _Id
 
-    const newStudent = await StudentModel.create(payload);
+    // TODO => creating student with session Transaction 01
+    const newStudent = await StudentModel.create([payload], { session });
+    if (!newStudent.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Failed to create student");
+    }
+
+    // TODO => commit transaction
+    await session.commitTransaction();
+
+    // TODO => end this session
+    await session.endSession();
+
     return newStudent;
+  } catch (error) {
+    // TODO => If session environment get any error then abort the transaction process
+    await session.abortTransaction();
+
+    // TODO => after aborting end the session
+
+    await session.endSession();
   }
 };
 
