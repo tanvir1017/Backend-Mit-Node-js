@@ -1,5 +1,7 @@
 import { Router } from "express";
+import sanitizeClientDataViaZod from "../../../middleware/sanitizeClientDataViaZod";
 import { StudentController } from "../controller/student.controller";
+import { StudentValidationViaZOD } from "../validation/student.validation";
 
 const router = Router();
 
@@ -10,9 +12,11 @@ router.route("/all").get(StudentController.getAllStudent); // Type 1 that I like
 router.route("/:studentId").get(StudentController.getSingleStudentById); // Type 1 that I like
 
 // delete single student by id
-router.route("/:studentId/delete").patch(StudentController.deleteStudentById); // Type 1 that I like
+router.route("/:studentId/delete").delete(StudentController.deleteStudentById); // Type 1 that I like
 
 // update single student by id
-router.route("/:studentId/update").patch(StudentController.updateStudent); // Type 1 that I like
+router
+  .route("/:studentId/update")
+  .patch(sanitizeClientDataViaZod(StudentValidationViaZOD.updateStudentSchemaValidation), StudentController.updateStudent); // Type 1 that I like
 
 export const StudentsRoutes = router;

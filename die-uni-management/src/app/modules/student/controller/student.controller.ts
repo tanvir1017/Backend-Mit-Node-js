@@ -93,7 +93,7 @@ const deleteStudentById = asyncHandler(async (req, res) => {
 
 const updateStudent = asyncHandler(async (req, res) => {
   const { studentId } = req.params;
-  const { studentUpdateAbleInfo } = req.body;
+  const { student } = req.body;
 
   // TODO => checking id is available or not
   if (!studentId) {
@@ -105,10 +105,7 @@ const updateStudent = asyncHandler(async (req, res) => {
     });
   }
 
-  const result = await studentService.updateStudentFromDB(
-    studentId,
-    studentUpdateAbleInfo,
-  );
+  const result = await studentService.updateStudentFromDB(studentId, student);
   sendResponse(res, {
     statuscode: httpStatus.OK,
     success: true,

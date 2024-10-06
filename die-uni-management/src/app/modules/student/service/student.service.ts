@@ -13,7 +13,7 @@ const getAllStudentsFromDB = async () => {
 
 // get single student
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await StudentModel.findById(id)
+  const result = await StudentModel.findOne({ id })
     .populate("user")
     .populate("admissionSemester")
     .populate({
@@ -75,22 +75,56 @@ const deleteStudentFromDB = async (id: string) => {
 
     // TODO => end transaction
     await session.endSession();
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to delete student",
+    );
   }
 };
 
 /**
  * Updating student information from db
  * @param {string} id
- * @param {object} fieldAndValue The object from req.body
+ * @param {object} studentUpdateAbleData The object from req.body
  */
-const updateStudentFromDB = async <T extends StudentInterface.TStudent>(
+const updateStudentFromDB = async (
   id: string,
-  fieldAndValue: T,
+  studentUpdateAbleData: Partial<StudentInterface.TStudent>,
 ) => {
-  const result = await StudentModel.updateOne(
+  const { name, localGuardian, guardian, ...rest } = studentUpdateAbleData;
+  console.log("🚀 ~ studentUpdateAbleData:", studentUpdateAbleData);
+
+  const modifiedData: Record<string, unknown> = {
+    ...rest,
+  };
+
+  if (name && Object.keys(name).length) {
+    console.log("hello");
+    for (const [key, value] of Object.entries(name)) {
+      modifiedData[`name.${key}`] = value;
+    }
+  }
+
+  if (guardian && Object.keys(guardian).length) {
+    for (const [key, value] of Object.entries(guardian)) {
+      modifiedData[`guardian.${key}`] = value;
+    }
+  }
+
+  if (localGuardian && Object.keys(localGuardian).length) {
+    for (const [key, value] of Object.entries(localGuardian)) {
+      modifiedData[`localGuardian.${key}`] = value;
+    }
+  }
+  console.log("🚀 ~ modifiedData:", modifiedData);
+
+  const result = await StudentModel.findOneAndUpdate(
     { id },
-    { $set: { ...fieldAndValue } },
+    { modifiedData },
+    //{ new: true, runValidators: true },
   );
+  return result;
 };
 
 export const studentService = {
