@@ -1,6 +1,6 @@
 // ********** IMPORTING PACKAGES**********************
 import cors from "cors";
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFound from "./app/middleware/notFound";
 import routes from "./app/routes";
@@ -13,7 +13,8 @@ app.use(express.json());
 app.use(cors());
 
 //** Routing
-app.get("/api/v1/check", async (__req: Request, res: Response) => {
+app.get("/api/v1/check", async (req, res) => {
+  //Promise.reject();
   res.status(200).json({ message: "Hello from the server!" });
 });
 
