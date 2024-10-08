@@ -222,7 +222,7 @@ StudentSchema.pre("aggregate", function (next) {
 });
 
 StudentSchema.virtual("fullName").get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+  return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 // ** Creating model for schema
 const StudentModel = mongoose.model<StudentInterface.TStudent>(

@@ -1,63 +1,24 @@
 import httpStatus from "http-status";
 import mongoose from "mongoose";
+import QueryBuilder from "../../../builder/QueryBuilder";
 import AppError from "../../../errors/appError";
 import { User } from "../../user/model/user.model";
+import { studentSearchAbleField } from "../constant/student.constant";
 import * as StudentInterface from "../interface/student.interface";
 import StudentModel from "../model/student.model";
 
-// Get all students
+// TODO -> Get all students
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  // `$or` operation perform an OR operation in one or more collections. or operator takes a array of expression [{<expression1>, {<expression2>, {<expressionN>}}}]
-  // find({$or: [{email: {$eq: "test@example.com"}}, {name: "test"}]})
-  // db.inventory.find( { $or: [ { quantity: { $lt: 20 } }, { price: 10 } ] } )
-  // [{name: {$regex: searchQuery, $options: "i" |  "m" | "x"....}}, {<expression2>}, {<expressionN>}]
+  const studentQuery = new QueryBuilder(StudentModel.find(), query)
+    .search(studentSearchAbleField)
+    .filter()
+    .sort()
+    .paginate()
+    .fieldLimiting();
 
-  // TODO => check if the searchTerm in query object empty or not
-  let searchTerm = "";
+  const result = await studentQuery.modelQuery;
 
-  if (query?.searchTerm) {
-    // TODO => if it is not empty then re-assign query value into searchTerm
-    searchTerm = query.searchTerm as string;
-  }
-
-  // TODO => an array that hold the field which will be operated by or operator for search
-  const studentSearchAbleField: string[] = [
-    "email",
-    "name.firstName",
-    "presentAddress",
-  ];
-
-  // TODO -> A partial search operation by more than one field
-
-  const findBasedOnSearchTerm = StudentModel.find({
-    $or: studentSearchAbleField.map((field: string) => ({
-      // TODO -> making an string into a object key by wrapping it in square bracket [field] => {"name.firstName": ....}
-
-      [field]: { $regex: searchTerm, $options: "i" },
-    })),
-  });
-
-  // TODO -> Performing an exact search based on any field given by query {email: 'u@email.com} while partial and exact filter can't work together we've to remove partial filter when it comes to exact match
-
-  // TODO -> An array that will remove partial query fields
-
-  const excludeField = ["searchTerm"];
-
-  // TODO -> for exclude the field we've to first make a carbon copy of query because we don't wanna to delete main query value
-  const CCQuery = { ...query }; // carbon copy of main query
-
-  excludeField.forEach((el) => delete CCQuery[el]); // deleting the partial values item
-
-  const exactMatchingQuery = await findBasedOnSearchTerm.find(CCQuery);
-  // .populate("admissionSemester")
-  // .populate({
-  //   path: "academicDepartment",
-  //   populate: {
-  //     path: "academicFaculty",
-  //   },
-  // }); // create student data
-
-  return exactMatchingQuery;
+  return result;
 };
 
 // get single student
@@ -142,7 +103,6 @@ const updateStudentFromDB = async (
   studentUpdateAbleData: Partial<StudentInterface.TStudent>,
 ) => {
   const { name, localGuardian, guardian, ...rest } = studentUpdateAbleData;
-  console.log("🚀 ~ studentUpdateAbleData:", studentUpdateAbleData);
 
   const modifiedData: Record<string, unknown> = {
     ...rest,
@@ -166,7 +126,6 @@ const updateStudentFromDB = async (
       modifiedData[`localGuardian.${key}`] = value;
     }
   }
-  console.log("🚀 ~ modifiedData:", modifiedData);
 
   const result = await StudentModel.findOneAndUpdate({ id }, modifiedData, {
     new: true,
@@ -174,7 +133,91 @@ const updateStudentFromDB = async (
   });
   return result;
 };
+/**
+const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
+  // `$or` operation perform an OR operation in one or more collections. or operator takes a array of expression [{<expression1>, {<expression2>, {<expressionN>}}}]
+  // find({$or: [{email: {$eq: "test@example.com"}}, {name: "test"}]})
+  // db.inventory.find( { $or: [ { quantity: { $lt: 20 } }, { price: 10 } ] } )
+  // [{name: {$regex: searchQuery, $options: "i" |  "m" | "x"....}}, {<expression2>}, {<expressionN>}]
+  // TODO -> for exclude the field we've to first make a carbon copy of query because we don't wanna to delete main query value
 
+  const CCQuery = { ...query }; // carbon copy of main query
+
+  // TODO => check if the searchTerm in query object empty or not
+
+  let searchTerm = "";
+  if (query?.searchTerm) {
+    searchTerm = query.searchTerm as string;
+  }
+
+  // TODO -> A partial search operation by more than one field
+
+  const findBasedOnSearchTerm = StudentModel.find({
+    $or: studentSearchAbleField.map((field: string) => ({
+      // TODO -> making an string into a object key by wrapping it in square bracket [field] => {"name.firstName": ....}
+
+      [field]: { $regex: searchTerm, $options: "i" },
+    })),
+  });
+
+  // TODO -> Performing an exact search based on any field given by query {email: 'u@email.com} while partial and exact filter can't work together we've to remove partial filter when it comes to exact match
+
+  // TODO -> An array that will remove partial query fields
+
+  const excludeField = ["searchTerm", "sort", "limit", "page", "fields"];
+
+  excludeField.forEach((el) => delete CCQuery[el]); // deleting the partial values item
+
+  const exactMatchingQuery = findBasedOnSearchTerm.find(CCQuery);
+  // .populate("user")
+  // .populate("admissionSemester")
+  // .populate({
+  //   path: "academicDepartment",
+  //   populate: {
+  //     path: "academicFaculty",
+  //   },
+  // }); // create student data;;
+
+  // TODO -> Sorting documents based on last created data.
+  let sort = "-createdAt";
+
+  if (query?.sort) {
+    sort = query.sort as string;
+  }
+
+  const sortQuery = exactMatchingQuery.sort(sort);
+
+  // TODO -> Limiting docs
+
+  let page = 1;
+  let limit = 1;
+  let skip = 0;
+
+  if (query?.limit) {
+    limit = Number(query.limit);
+  }
+
+  if (query?.page) {
+    page = Number(query.page);
+    skip = (page - 1) * limit; // ! Formula of pagination => (page - 1) * limitNum(X)
+  }
+
+  const paginateQuery = sortQuery.skip(skip);
+
+  const limitingDocs = paginateQuery.limit(limit);
+
+  // TODO -> field limiting
+
+  let fields = "-__v";
+  if (query?.fields) {
+    fields = (query.fields as string).split(",").join(" ");
+  }
+
+  const fieldQuery = await limitingDocs.select(fields); // fields="name email guardian"
+
+  return fieldQuery;
+};
+ */
 export const studentService = {
   getAllStudentsFromDB,
   getSingleStudentFromDB,
