@@ -5,8 +5,9 @@ import sendResponse from "../../../utils/sendResponse";
 import { studentService } from "../service/student.service";
 
 // TODO =>  Student fetch controller From DB
-const getAllStudent = asyncHandler(async (__req, res) => {
-  const result = await studentService.getAllStudentsFromDB();
+const getAllStudent = asyncHandler(async (req, res) => {
+  const searchTerm = req.query;
+  const result = await studentService.getAllStudentsFromDB(searchTerm);
 
   // Sending response to the client
   sendResponse(res, {

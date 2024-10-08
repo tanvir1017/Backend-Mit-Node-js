@@ -76,10 +76,7 @@ const createStudentIntoDB = async (
 
     await session.endSession();
 
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to create student",
-    );
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, error);
   }
 };
 
