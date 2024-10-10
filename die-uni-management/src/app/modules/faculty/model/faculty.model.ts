@@ -105,6 +105,28 @@ const FacultySchema = new mongoose.Schema<FacultyInterface.TFaculty>(
   },
 );
 
+FacultySchema.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+
+  next();
+});
+
+FacultySchema.pre("findOne", function (next) {
+  this.findOne({ isDeleted: { $ne: true } });
+
+  next();
+});
+
+FacultySchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { isDelete: { $ne: true } } });
+  next();
+});
+
+FacultySchema.pre("findOneAndUpdate", function (next) {
+  this.findOne({ isDeleted: { $ne: true } });
+  next();
+});
+
 export const FacultyModel = mongoose.model<FacultyInterface.TFaculty>(
   "faculty",
   FacultySchema,
