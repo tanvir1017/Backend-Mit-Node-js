@@ -109,7 +109,6 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
     name: {
       type: UserNameSchema,
       required: [true, "Name property missing please re-check "],
-      trim: true,
     },
     age: {
       type: Number,
@@ -217,7 +216,6 @@ StudentSchema.pre("findOne", function (next) {
 
 StudentSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-
   next();
 });
 

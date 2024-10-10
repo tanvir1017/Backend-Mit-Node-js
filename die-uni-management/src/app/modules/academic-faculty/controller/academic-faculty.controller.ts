@@ -49,6 +49,7 @@ const getSingleAcademicFaculty = asyncHandler(async (req, res, next) => {
       statuscode: httpStatus.NOT_FOUND,
       success: false,
       message: "Academic Faculty not found",
+      data: null,
     });
   }
 
@@ -72,6 +73,7 @@ const updateSingleAcademicFaculty = asyncHandler(async (req, res, next) => {
       statuscode: httpStatus.NOT_FOUND,
       message: "Academic Faculty ID not found",
       success: false,
+      data: null,
     });
   }
   const result =

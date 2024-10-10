@@ -49,6 +49,7 @@ const createFolderStructure = (folderName) => {
   });
 
   console.log(`Structure for ${folderName} created successfully!`);
+  process.exit(1);
 };
 
 // Get folder name from command line arguments or prompt the user
