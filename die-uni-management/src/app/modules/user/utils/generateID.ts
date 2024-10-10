@@ -23,7 +23,7 @@ const findLastStudentId = async () => {
 
 // TODO =>  year semester code 4 digits number => 2024020001
 export const generatedID = async (payload: TAcademicSemester) => {
-  let currentId = (0).toString(); // '0000'
+  let currentId = (0).toString(); // '0'
 
   const latestStudentId = (await findLastStudentId()) as string;
 

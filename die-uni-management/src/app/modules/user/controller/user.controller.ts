@@ -22,6 +22,21 @@ const createStudent = asyncHandler(async (req, res) => {
   });
 });
 
+const createFaculty = asyncHandler(async (req, res) => {
+  const { password, faculty } = req.body;
+  const result = await UserServices.createFacultyIntoDB(password, faculty);
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Failed to create new Faculty");
+  }
+  sendResponse(res, {
+    statuscode: httpStatus.CREATED,
+    success: true,
+    message: "Faculty created successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createStudent,
+  createFaculty,
 };

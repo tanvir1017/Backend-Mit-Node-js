@@ -57,7 +57,7 @@ const createStudentSchemaValidation = z.object({
       presentAddress: z.string().trim(),
       permanentAddress: z.string().trim(),
       bloodGroup: z.enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"], {
-        message: "Blood group must be a valid blood group for humans",
+        message: "Blood group must be a valid blood group",
       }),
       guardian: createGuardianValidationSchema,
       profileImage: z.string().trim().optional(),

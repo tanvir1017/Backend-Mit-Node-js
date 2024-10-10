@@ -1,5 +1,9 @@
 // import { Schema, model, connect } from "mongoose";
 import { Types } from "mongoose";
+import {
+  T_GENDER_COMMON__TYPE,
+  TBLOOD_GROUP,
+} from "../../../interface/common/common.type";
 
 // * How **
 
@@ -33,16 +37,15 @@ type TStudent = {
   id: string;
   user: Types.ObjectId;
   name: TUserName;
-  password: string;
   age: number;
-  gender: "male" | "female" | "others";
+  gender: T_GENDER_COMMON__TYPE;
   dateOfBirth: string;
   email: string;
   contactNo: string;
   emergencyContactNumber: string;
   presentAddress: string;
   permanentAddress: string;
-  bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  bloodGroup?: TBLOOD_GROUP;
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
   profileImage?: string;
