@@ -9,14 +9,19 @@ const router = Router();
 router.route("/all").get(StudentController.getAllStudent); // Type 1 that I like
 
 // get single student by id route
-router.route("/:studentId").get(StudentController.getSingleStudentById); // Type 1 that I like
+router.route("/:id").get(StudentController.getSingleStudentById); // Type 1 that I like
 
 // delete single student by id
-router.route("/:studentId/delete").delete(StudentController.deleteStudentById); // Type 1 that I like
+router.route("/:id/delete").delete(StudentController.deleteStudentById); // Type 1 that I like
 
 // update single student by id
 router
-  .route("/:studentId/update")
-  .patch(sanitizeClientDataViaZod(StudentValidationViaZOD.updateStudentSchemaValidation), StudentController.updateStudent); // Type 1 that I like
+  .route("/:id/update")
+  .patch(
+    sanitizeClientDataViaZod(
+      StudentValidationViaZOD.updateStudentSchemaValidation,
+    ),
+    StudentController.updateStudent,
+  ); // Type 1 that I like
 
 export const StudentsRoutes = router;

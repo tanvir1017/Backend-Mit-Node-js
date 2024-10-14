@@ -13,7 +13,7 @@ const findLastFaculty = async () => {
     .sort({ createdAt: -1 })
     .lean();
 
-  return facultyUserID?.id ? facultyUserID?.id : undefined;
+  return facultyUserID?.id ? facultyUserID.id : undefined;
 };
 
 export const generateFacultyId = async () => {

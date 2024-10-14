@@ -26,12 +26,13 @@ export const FacultyControllers = {
 
   //  TODO => get only single faculty
   getSingleFaculty: asyncHandler(async (req, res) => {
-    const { facultyId } = req.params;
+    const { id } = req.params;
+    console.log("🚀 ~ getSingleFaculty:asyncHandler ~ id:", id);
 
-    if (!facultyId) {
+    if (!id) {
       throw new AppError(httpStatus.BAD_REQUEST, "Faculty ID required");
     }
-    const result = await FacultyServices.getSingleFacultyFromDB(facultyId);
+    const result = await FacultyServices.getSingleFacultyFromDB(id);
     if (!result) {
       return sendResponse(res, {
         statuscode: httpStatus.BAD_REQUEST,
@@ -48,17 +49,57 @@ export const FacultyControllers = {
     });
   }),
 
+  // TODO => update faculty from db
+  updateFaculty: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { faculty: facultyData } = req.body;
+
+    if (!id) {
+      return sendResponse(res, {
+        statuscode: httpStatus.NOT_ACCEPTABLE,
+        success: false,
+        message: "Faculty ID is required",
+        data: null,
+      });
+    }
+    if (!Object.keys(facultyData).length) {
+      return sendResponse(res, {
+        statuscode: httpStatus.NOT_ACCEPTABLE,
+        success: false,
+        message: "Faculty data required, empty value does not acceptable",
+        data: null,
+      });
+    }
+
+    const result = await FacultyServices.updateFacultyFromDB(id, facultyData);
+    if (!result) {
+      return sendResponse(res, {
+        statuscode: httpStatus.NOT_FOUND,
+        success: false,
+        message: "Faculty not found by this id",
+        data: null,
+      });
+    }
+
+    sendResponse(res, {
+      statuscode: httpStatus.OK,
+      success: true,
+      message: "Faculty updated successfully",
+      data: result,
+    });
+  }),
+
   // TODO => delete faculty from db
   deleteFaculty: asyncHandler(async (req, res) => {
-    const { facultyId } = req.params;
+    const { id } = req.params;
 
-    if (!facultyId) {
+    if (!id) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "Faculty ID missing or mismatch",
       );
     }
-    const result = await FacultyServices.deleteFacultyFromDB(facultyId);
+    const result = await FacultyServices.deleteFacultyFromDB(id);
     if (!result) {
       return sendResponse(res, {
         statuscode: httpStatus.BAD_REQUEST,

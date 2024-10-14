@@ -23,7 +23,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
 // get single student
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await StudentModel.findOne({ id })
+  const result = await StudentModel.findById(id)
     .populate("user")
     .populate("admissionSemester")
     .populate({
@@ -50,8 +50,21 @@ const deleteStudentFromDB = async (id: string) => {
   try {
     // TODO => Now start the session transaction
     session.startTransaction();
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+
+    const deletedStudent = await StudentModel.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session },
+    );
+    if (!deletedStudent) {
+      throw new AppError(httpStatus.BAD_REQUEST, "failed to delete student");
+    }
+
+    // TODO => After that Delete user
+
+    const userId = deletedStudent.user;
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       {
         new: true,
@@ -61,15 +74,6 @@ const deleteStudentFromDB = async (id: string) => {
 
     if (!deletedUser) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to delete user");
-    }
-
-    const deletedStudent = await StudentModel.findOneAndUpdate(
-      { id },
-      { isDeleted: true },
-      { new: true, session },
-    );
-    if (!deletedStudent) {
-      throw new AppError(httpStatus.BAD_REQUEST, "failed to delete student");
     }
 
     // TODO =>  commit transaction
@@ -98,6 +102,7 @@ const deleteStudentFromDB = async (id: string) => {
  * @param {string} id
  * @param {object} studentUpdateAbleData The object from req.body
  */
+// TODO => Update student information from db
 const updateStudentFromDB = async (
   id: string,
   studentUpdateAbleData: Partial<StudentInterface.TStudent>,
@@ -109,7 +114,6 @@ const updateStudentFromDB = async (
   };
 
   if (name && Object.keys(name).length) {
-    console.log("hello");
     for (const [key, value] of Object.entries(name)) {
       modifiedData[`name.${key}`] = value;
     }
@@ -127,7 +131,7 @@ const updateStudentFromDB = async (
     }
   }
 
-  const result = await StudentModel.findOneAndUpdate({ id }, modifiedData, {
+  const result = await StudentModel.findByIdAndUpdate(id, modifiedData, {
     new: true,
     runValidators: true,
   });
@@ -218,7 +222,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   return fieldQuery;
 };
  */
-export const studentService = {
+export const StudentService = {
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,

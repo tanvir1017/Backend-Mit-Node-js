@@ -48,7 +48,48 @@ const createFacultyValidationSchema = z.object({
 });
 
 //***************** UPDATE VALIDATION SCHEMA FOR FACULTY *****************************
-const updateFacultyValidationSchema = createFacultyValidationSchema.partial();
+
+const updateFacultyNameValidationSchema =
+  createFacultyNameValidationSchema.partial();
+const updateFacultyValidationSchema = z.object({
+  body: z.object({
+    faculty: z
+      .object({
+        name: updateFacultyNameValidationSchema,
+        email: z
+          .string()
+          .email("Please provide a valid email address")
+          .trim()
+          .optional(),
+        gender: z
+          .enum(["male", "female", "others"], {
+            message: "Gender must be Male, Female or Others",
+          })
+          .optional(),
+        dateOfBirth: z.string().trim().optional(),
+        age: z
+          .number({
+            message: "age should be a number",
+          })
+          .optional(),
+        contactNo: z.string().trim().optional(),
+        emergencyContactNo: z.string().trim().optional(),
+        presentAddress: z.string().trim().optional(),
+        permanentAddress: z.string().trim().optional(),
+        academicFaculty: z.string().trim().optional(),
+        academicDepartment: z.string().trim().optional(),
+        profileImage: z.string().trim().optional().optional(),
+        bloodGroup: z
+          .enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"], {
+            message: "Blood group must be a valid blood group ",
+          })
+          .optional(),
+        isDeleted: z.boolean().optional(),
+        designation: z.string().trim().optional(),
+      })
+      .partial(),
+  }),
+});
 
 export const FacultyValidationViaZod = {
   createFacultyValidationSchema,
