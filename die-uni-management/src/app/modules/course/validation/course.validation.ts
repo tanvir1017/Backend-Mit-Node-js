@@ -6,25 +6,33 @@ const PreRequisiteCourseSchemaValidation = z.object({
 });
 
 const createCourseSchemaValidation = z.object({
-  body: z.object({
-    title: z.string().trim(),
-    prefix: z.string().trim(),
-    code: z.number(),
-    credits: z.number(),
-    preRequisiteCourses: z.array(PreRequisiteCourseSchemaValidation).optional(),
-    isDeleted: z.boolean().optional(),
-  }),
+  body: z
+    .object({
+      title: z.string().trim(),
+      prefix: z.string().trim(),
+      code: z.number(),
+      credits: z.number(),
+      preRequisiteCourses: z
+        .array(PreRequisiteCourseSchemaValidation)
+        .optional(),
+      isDeleted: z.boolean().optional(),
+    })
+    .strict(),
 });
 
 const updateCourseSchemaValidation = z.object({
-  body: z.object({
-    title: z.string().trim().optional(),
-    prefix: z.string().trim().optional(),
-    code: z.number().optional(),
-    credits: z.number().optional(),
-    preRequisiteCourses: z.array(PreRequisiteCourseSchemaValidation).optional(),
-    isDeleted: z.boolean().optional().optional(),
-  }),
+  body: z
+    .object({
+      title: z.string().trim().optional(),
+      prefix: z.string().trim().optional(),
+      code: z.number().optional(),
+      credits: z.number().optional(),
+      preRequisiteCourses: z
+        .array(PreRequisiteCourseSchemaValidation)
+        .optional(),
+      isDeleted: z.boolean().optional().optional(),
+    })
+    .strict(),
 });
 
 export const CourseValidationViaZOD = {
