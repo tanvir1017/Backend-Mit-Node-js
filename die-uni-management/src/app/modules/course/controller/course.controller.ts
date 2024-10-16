@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import AppError from "../../../errors/appError";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
+import { TCourseFaculty } from "../interface/course.interface";
 import { CourseServices } from "../service/course.service";
 
 // TODO =>  Create course controller
@@ -106,10 +107,56 @@ const updateCourse = asyncHandler(async (req, res) => {
   });
 });
 
+const assignFaculties = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const { faculties }: { faculties: TCourseFaculty } = req.body;
+
+  const result = await CourseServices.assignFacultiesToCourse(
+    courseId,
+    faculties,
+  );
+  sendResponse(res, {
+    statuscode: httpStatus.CREATED,
+    success: true,
+    message: "Faculties assigned successfully",
+    data: result,
+  });
+});
+
+const removeFaculties = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const { faculties }: { faculties: TCourseFaculty } = req.body;
+
+  const result = await CourseServices.removeFacultiesToCourse(
+    courseId,
+    faculties,
+  );
+  sendResponse(res, {
+    statuscode: httpStatus.CREATED,
+    success: true,
+    message: "Faculties removed successfully",
+    data: result,
+  });
+});
+
+const getAllFaculties = asyncHandler(async (req, res) => {
+  const result = await CourseServices.getAllFacultiesFromDB();
+
+  sendResponse(res, {
+    statuscode: httpStatus.OK,
+    success: true,
+    message: "All faculties retrieved successfully",
+    data: result,
+  });
+});
+
 export const CourseControllers = {
   getAllCourses,
   deleteCourse,
   getSingleCourse,
   createCourse,
   updateCourse,
+  assignFaculties,
+  removeFaculties,
+  getAllFaculties,
 };

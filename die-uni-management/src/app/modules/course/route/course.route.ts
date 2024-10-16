@@ -5,7 +5,6 @@ import { CourseValidationViaZOD } from "../validation/course.validation";
 const router = express.Router();
 
 router.route("/all").get(CourseControllers.getAllCourses);
-router.route("/:id").get(CourseControllers.getSingleCourse);
 router
   .route("/create-course")
   .post(
@@ -23,7 +22,25 @@ router
     ),
     CourseControllers.updateCourse,
   );
+
 router.route("/:id/delete").delete(CourseControllers.deleteCourse);
 
+router
+  .route("/:courseId/assign-faculties")
+  .put(
+    sanitizeClientDataViaZod(CourseValidationViaZOD.facultiesWithCourse),
+    CourseControllers.assignFaculties,
+  );
+
+router
+  .route("/:courseId/remove-faculties")
+  .delete(
+    sanitizeClientDataViaZod(CourseValidationViaZOD.facultiesWithCourse),
+    CourseControllers.removeFaculties,
+  );
+
+router.route("/course-faculties").get(CourseControllers.getAllFaculties);
+
+router.route("/:id").get(CourseControllers.getSingleCourse);
 const CourseRoutes = router;
 export default CourseRoutes;
