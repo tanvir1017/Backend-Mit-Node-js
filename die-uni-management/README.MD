@@ -183,3 +183,5 @@ This is a backend project for managing students, faculty, and admins at Universi
 > > - 01 → Autumn
 > > - 02 → Summer
 > > - 03 → Fall
+
+[ER-Diagram](https://lucid.app/lucidchart/7627270e-2309-4ac6-9d49-6f50b194f8e6/edit?invitationId=inv_599915a0-d5f5-433a-839c-5d83f852728b)

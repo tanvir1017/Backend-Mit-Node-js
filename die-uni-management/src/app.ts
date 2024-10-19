@@ -3,7 +3,8 @@ import cors from "cors";
 import express, { Application } from "express";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFound from "./app/middleware/notFound";
-import routes from "./app/routes";
+import routes from "./app/routes/index";
+//import routes from "./app/routes";
 
 // ** making app variable and store it into express functions
 const app: Application = express();

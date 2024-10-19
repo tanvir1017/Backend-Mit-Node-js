@@ -28,7 +28,6 @@ class QueryBuilder<T> {
     const queryObj = { ...this.query };
 
     const excludeField = ["searchTerm", "sort", "limit", "page", "fields"];
-
     excludeField.forEach((el) => delete queryObj[el]); // deleting the partial values item
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
@@ -47,7 +46,7 @@ class QueryBuilder<T> {
 
   paginate() {
     const page = Number(this?.query?.page) || 1;
-    const limit = Number(this?.query?.limit) || 1;
+    const limit = Number(this?.query?.limit) || 10;
     const skip = Number(page - 1) * limit || 0;
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
