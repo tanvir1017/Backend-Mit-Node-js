@@ -31,7 +31,7 @@ const createFolderStructure = (folderName) => {
     "interface",
     "model",
     "validation",
-    "constant"
+    "constant",
   ];
 
   // Create the main folder if it doesn't exist
