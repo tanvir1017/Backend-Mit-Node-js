@@ -1,17 +1,17 @@
-import { Types } from "mongoose";
+import { Schema } from "mongoose";
 
 export type Days = "Sat" | "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri";
 
 export type TOfferCourse = {
-  semesterRegistration: Types.ObjectId;
-  academicSemester: Types.ObjectId;
-  academicFaculty: Types.ObjectId;
-  academicDepartment: Types.ObjectId;
-  course: Types.ObjectId;
-  faculty: Types.ObjectId;
+  semesterRegistration: Schema.Types.ObjectId;
+  academicSemester?: Schema.Types.ObjectId;
+  academicFaculty: Schema.Types.ObjectId;
+  academicDepartment: Schema.Types.ObjectId;
+  course: Schema.Types.ObjectId;
+  faculty: Schema.Types.ObjectId;
   maxCapacity: number;
   section: number;
   days: Days;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
 };
