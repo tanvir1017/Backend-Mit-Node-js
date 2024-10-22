@@ -7,15 +7,23 @@ import { FacultyModel } from "../../faculty/model/faculty.model";
 import { SemesterRegistrationModel } from "../../semester-registration/model/semester-registration.model";
 import { TOfferCourse } from "../interface/offered-course.interface";
 import OfferCourseModel from "../model/offered-course.model";
+import { OfferedCourseUtils } from "../utils/offered-course.utils";
 
+/**
+ *
+ * @param model
+ * @param id
+ * @returns if data found true nor null
+ */
 const validateByDbQuery = async <T>(
   model: mongoose.Model<T>,
-  id: Schema.Types.ObjectId,
+  id: string | Schema.Types.ObjectId,
 ) => {
   const result = await model.findById(id);
   return result;
 };
 
+// TODO => Create offered course
 const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
   const {
     semesterRegistration,
@@ -23,6 +31,10 @@ const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
     academicDepartment,
     course,
     faculty,
+    section,
+    days,
+    startTime,
+    endTime,
   } = payload;
 
   //* check if the semester registration id is exists!
@@ -60,10 +72,55 @@ const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
   if (!isCourseIdExist) throw new AppError(400, "Course doesn't exist");
 
   //* check Faculty id exist
-  const isFacultyIdExist = await validateByDbQuery(FacultyModel, faculty);
+  const isFacultyExist = await validateByDbQuery(FacultyModel, faculty);
 
-  if (!isFacultyIdExist) throw new AppError(400, "Faculty doesn't exist");
+  if (!isFacultyExist) throw new AppError(400, "Faculty doesn't exist");
 
+  //* check if academicFaculty belongs to academicDepartment
+  const isAFacultyBelongsToADepartment = await AcademicDepartment.findOne({
+    _id: academicDepartment,
+    academicFaculty,
+  });
+
+  if (!isAFacultyBelongsToADepartment)
+    throw new AppError(
+      400,
+      `The ${isAcademicDepartmentIdExist.name} doesn't belongs to the ${isAcademicFacultyIdExist.name}`,
+    );
+
+  //* check if the same offered course same section in same registered semester exists
+  const ifSameOfferedCourseSameSectionInSameRegisteredSemester =
+    await OfferCourseModel.findOne({
+      semesterRegistration,
+      course,
+      section,
+    });
+
+  if (ifSameOfferedCourseSameSectionInSameRegisteredSemester)
+    throw new AppError(
+      400,
+      "Offered course with same section is already exist!",
+    );
+
+  //* check if the same faculty running same section in same offered course!
+  const assignedSchedules = await OfferCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select("days startTime endTime"); // only select `days startTime endTime`
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  if (OfferedCourseUtils.hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(
+      409,
+      "Same faculty can't have same course at same day on same time!",
+    );
+  }
   const result = await OfferCourseModel.create({
     ...payload,
     academicSemester,
@@ -71,12 +128,73 @@ const createOfferedCourseIntoDB = async (payload: TOfferCourse) => {
   return result;
 };
 
+// TODO => Update offered course
 const updateOfferedCourseIntoDB = async (
-  id: string,
-  payload: Partial<TOfferCourse>,
-) => {};
+  id: string | Schema.Types.ObjectId,
+  payload: Pick<TOfferCourse, "faculty" | "days" | "startTime" | "endTime">,
+) => {
+  const { faculty, days, startTime, endTime } = payload;
 
-const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {};
+  //* check id is found or not
+  const isOfferedCourseExist = await validateByDbQuery(OfferCourseModel, id);
+  if (!isOfferedCourseExist)
+    throw new AppError(400, "Offered course not found");
+
+  //* check faculty exist or not
+  const isFacultyExist = await validateByDbQuery(
+    FacultyModel,
+    faculty as Schema.Types.ObjectId,
+  );
+  if (!isFacultyExist) throw new AppError(400, "Faculty does not exist");
+
+  //* finding out semester registration
+  const offeredCourse = await OfferCourseModel.findById(id);
+  const semesterRegistration = offeredCourse?.semesterRegistration;
+
+  //* update only if the offered course in UPCOMING status
+  const semesterRegistrationStatus =
+    await SemesterRegistrationModel.findById(semesterRegistration);
+
+  if (
+    semesterRegistrationStatus &&
+    semesterRegistrationStatus.status !== "UPCOMING"
+  ) {
+    throw new AppError(400, "Update available only UPCOMING semester!");
+  }
+
+  //* check if the same faculty running same section in same offered course!
+  const assignedSchedules = await OfferCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select("days startTime endTime"); // only select `days startTime endTime`
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  if (OfferedCourseUtils.hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(
+      409,
+      "Same faculty can't have same course at same day on same time!",
+    );
+  }
+
+  const result = await OfferCourseModel.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
+// TODO => Get all offered Courses
+const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
+  const result = await OfferCourseModel.find();
+
+  return result;
+};
 
 const getSingleOfferedCourseFromDB = async (id: string) => {};
 
