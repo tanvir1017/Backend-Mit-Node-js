@@ -22,9 +22,9 @@ router
     SemesterRegistrationController.createSemesterRegistration,
   );
 
-/* router
+router
   .route("/:id/delete")
-  .delete(SemesterRegistrationController.deleteRegisteredSemester); */
+  .delete(SemesterRegistrationController.deleteSemesterRegistration);
 
 router
   .route("/:id/update")

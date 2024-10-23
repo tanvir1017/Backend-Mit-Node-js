@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import QueryBuilder from "../../../builder/QueryBuilder";
 import AppError from "../../../errors/appError";
 import { AcademicSemester } from "../../academic-semester/model/academicSemester.model";
+import OfferCourseModel from "../../offered-course/model/offered-course.model";
 import { SEMESTER_REGISTRATION_STATUS_OBJ } from "../constant/semester-registration.constant";
 import { TSemesterRegistration } from "../interface/semester-registration.interface";
 import { SemesterRegistrationModel } from "../model/semester-registration.model";
@@ -129,10 +131,88 @@ const updateRegisteredSemesterIntoDB = async (
 
   return result;
 };
+// TODO => Delete semester registration and offered courses associated with
+const deleteSemesterRegistrationFromDB = async (id: string) => {
+  /** 
+  * Step1: Delete associated offered courses.
+  * Step2: Delete semester registration when the status is 
+  'UPCOMING'.
+  **/
+
+  const isSemesterRegistrationExists =
+    await SemesterRegistrationModel.findById(id);
+
+  if (!isSemesterRegistrationExists)
+    throw new AppError(400, "semester registration not found");
+
+  const semesterRegistrationStatus = isSemesterRegistrationExists.status;
+
+  if (semesterRegistrationStatus !== "UPCOMING") {
+    throw new AppError(
+      400,
+      `You can not update as the registered semester is ${semesterRegistrationStatus}`,
+    );
+  }
+
+  //* First we've to delete the semester registration associated  courses
+
+  const session = await mongoose.startSession();
+  try {
+    //* start session first
+    session.startTransaction();
+
+    //* while its playing two database write we must use rollback and transaction
+    const deletedOfferedCourse = await OfferCourseModel.deleteMany(
+      {
+        semesterRegistration: id,
+      },
+      {
+        session,
+      },
+    );
+    console.log(
+      "🚀 ~ deleteSemesterRegistrationFromDB ~ deletedOfferedCourse:",
+      deletedOfferedCourse,
+    );
+
+    if (!deletedOfferedCourse) {
+      throw new AppError(400, "Failed to delete semester registration !");
+    }
+
+    const deleteSemesterRegistration =
+      await SemesterRegistrationModel.findByIdAndDelete(id, {
+        session,
+        new: true,
+      });
+
+    if (!deleteSemesterRegistration) {
+      throw new AppError(400, "Failed to delete semester registration !");
+    }
+
+    //* after that we've to commit the transaction
+    await session.commitTransaction();
+
+    //* then end the session transaction
+    await session.endSession();
+
+    return null;
+  } catch (error) {
+    //* if we get any error abortTransaction()
+    await session.abortTransaction();
+
+    //* then endSession()
+    await session.endSession();
+
+    throw new AppError(400, error);
+  }
+
+  //* Then we can delete the semester registration
+};
 
 export const SemesterRegistrationServices = {
   getAllRegisteredSemesterFromDB,
   getSingleRegisteredSemesterFromDB,
   createSemesterRegistrationIntoDB,
   updateRegisteredSemesterIntoDB,
+  deleteSemesterRegistrationFromDB,
 };
