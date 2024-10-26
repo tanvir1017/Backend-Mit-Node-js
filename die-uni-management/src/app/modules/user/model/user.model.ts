@@ -17,11 +17,15 @@ const UserSchema = new mongoose.Schema<
     password: {
       type: String,
       required: true,
+      select: 0,
     },
     needsPasswordChange: {
       type: Boolean,
       default: true,
       required: true,
+    },
+    passwordChangedAt: {
+      type: Date,
     },
     role: {
       type: String,
@@ -60,13 +64,13 @@ UserSchema.pre("save", async function (next) {
   // calling next function/middleware
   next();
 });
-
+/* 
 // TODO => Post save middle/hooks ware: work after save method
 UserSchema.post("save", function (doc, next) {
   // TODO => Post save middle/hooks function will have two parameters doc, next
   doc.password = ""; // making password empty
   next();
-});
+}); */
 
 // * Query Middleware
 
@@ -93,7 +97,7 @@ UserSchema.pre("aggregate", function (next) {
 
 // TODO => Implement static method for user exist or not
 UserSchema.statics.isUserExistByCustomId = async function (id: string) {
-  return await User.findOne({ id });
+  return await User.findOne({ id }).select("+password");
 };
 
 // TODO => Implement static method for check password matched
@@ -104,11 +108,11 @@ UserSchema.statics.isPasswordMatched = async function (
   return await bcrypt.compare(plainPassword, hashedPassword);
 };
 
-/* // TODO => check if user blocked or not
+// TODO => check if user blocked or not
 UserSchema.statics.isUserBlocked = async function (id: string) {
   const user = await User.findOne({ id });
   return user?.status === "blocked" ? true : false;
-}; */
+};
 
 export const User = model<TUserInterface.TUser, TUserInterface.UserModel>(
   "User",

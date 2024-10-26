@@ -7,6 +7,17 @@ const validateLoginUser = z.object({
   }),
 });
 
+const validatePreUser = z.object({
+  body: z.object({
+    oldPassword: z.string({ required_error: "Old password must be provided" }),
+    newPassword: z.string({ required_error: "password must be provided" }),
+    // confirmPassword: z.string({
+    //   required_error: "password and confirm password didn't match",
+    // }),
+  }),
+});
+
 export const ValidateAuthUserViaZOD = {
   validateLoginUser,
+  validatePreUser,
 };
