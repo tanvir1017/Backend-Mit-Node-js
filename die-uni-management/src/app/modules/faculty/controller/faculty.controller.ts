@@ -1,4 +1,4 @@
-import httpStatus from "http-status";
+import httpStatus from "http-status-codes";
 import AppError from "../../../errors/appError";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
@@ -27,7 +27,8 @@ export const FacultyControllers = {
   //  TODO => get only single faculty
   getSingleFaculty: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log("🚀 ~ getSingleFaculty:asyncHandler ~ id:", id);
+    const { user } = req;
+    console.log("🚀 ~ getSingleFaculty:asyncHandler ~ user:", user);
 
     if (!id) {
       throw new AppError(httpStatus.BAD_REQUEST, "Faculty ID required");

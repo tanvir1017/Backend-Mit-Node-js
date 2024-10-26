@@ -104,11 +104,11 @@ UserSchema.statics.isPasswordMatched = async function (
   return await bcrypt.compare(plainPassword, hashedPassword);
 };
 
-// TODO => check if user blocked or not
+/* // TODO => check if user blocked or not
 UserSchema.statics.isUserBlocked = async function (id: string) {
   const user = await User.findOne({ id });
   return user?.status === "blocked" ? true : false;
-};
+}; */
 
 export const User = model<TUserInterface.TUser, TUserInterface.UserModel>(
   "User",

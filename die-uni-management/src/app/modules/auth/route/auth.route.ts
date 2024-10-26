@@ -5,11 +5,10 @@ import { ValidateAuthUserViaZOD } from "../validation/auth.validation";
 
 const router = Router();
 
-router
-  .route("/login")
-  .post(
-    sanitizeClientDataViaZod(ValidateAuthUserViaZOD.validateLoginUser),
-    AuthController.loginValidation,
-  );
+router.route("/login").post(
+  sanitizeClientDataViaZod(ValidateAuthUserViaZOD.validateLoginUser),
+
+  AuthController.loginValidation,
+);
 
 export const AuthRoutes = router;

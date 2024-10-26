@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+import config from "../../../config";
 import AppError from "../../../errors/appError";
 import { User } from "../../user/model/user.model";
 import { TLoginUser } from "../interface/auth.interface";
@@ -12,12 +14,12 @@ const loginValidateUser = async (payload: TLoginUser) => {
   }
 
   //* check if the user is deleted(soft) or not
-  /* if (isUserDeleted) {
+  if (user.isDeleted) {
     throw new AppError(400, "User is not exist maybe deleted");
-  } */
+  }
 
   //* check if the user is blocked or not
-  if (await User.isUserBlocked(payload?.id)) {
+  if (user.status === "blocked") {
     throw new AppError(400, "User is blocked by admin");
   }
 
@@ -26,9 +28,17 @@ const loginValidateUser = async (payload: TLoginUser) => {
     throw new AppError(400, "Password and user doesn't match");
   }
 
-  //* access granted.
+  //* access granted. and return token to client
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
 
-  return payload;
+  const accessToken = jwt.sign(jwtPayload, config.JWT_ACCESS_TOKEN!, {
+    expiresIn: "10d",
+  });
+
+  return { accessToken, needPasswordChange: user.needsPasswordChange };
 };
 export const AuthServices = {
   loginValidateUser,

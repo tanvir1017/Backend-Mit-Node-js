@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from "http-status";
+import httpStatus from "http-status-codes";
 import mongoose from "mongoose";
 import QueryBuilder from "../../../builder/QueryBuilder";
 import AppError from "../../../errors/appError";
@@ -21,7 +20,7 @@ const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleAdminFromDB = async (id: string) => {
-  const result = await Admin.findById(id);
+  const result = await Admin.findById(id).populate("user");
   return result;
 };
 

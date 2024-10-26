@@ -1,4 +1,4 @@
-import httpStatus from "http-status";
+import httpStatus from "http-status-codes";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
 import { AdminServices } from "../service/admin.service";

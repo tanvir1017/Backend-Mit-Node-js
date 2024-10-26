@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status";
+import httpStatus from "http-status-codes";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
-import { studentService } from "../../student/service/student.service";
+
+import { StudentService } from "../../student/service/student.service";
 import { AcademicSemesterServices } from "../service/academicSemester.service";
 
 // Todo => Create a new academic semester
@@ -22,8 +23,8 @@ const createAcademicSemester = asyncHandler(
 
 // Todo => Get all academic semesters
 const getAcademicSemesters = asyncHandler(
-  async (__req: Request, res: Response, next: NextFunction) => {
-    const result = await studentService.getAllStudentsFromDB();
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await StudentService.getAllStudentsFromDB(req.query);
 
     // Sending response to the client
     sendResponse(res, {

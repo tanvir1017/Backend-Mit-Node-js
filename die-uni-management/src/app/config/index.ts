@@ -10,4 +10,5 @@ export default {
   ATLAS_URI: process.env.DATABASE_URL,
   BCRYPT_SALT: process.env.BCRYPT_SALT_ROUNDS,
   DEFAULT_PASS: process.env.DEFAULT_PASS,
+  JWT_ACCESS_TOKEN: process.env.JWT_ACCESS_TOKEN,
 };

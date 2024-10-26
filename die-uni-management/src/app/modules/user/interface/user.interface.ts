@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { USER_ROLE } from "../constant/user.constant";
 
 export interface TUser {
   id: string;
@@ -22,3 +23,5 @@ export interface UserModel extends mongoose.Model<TUser> {
   //** check is user blocked or not*/
   isUserBlocked: (id: string) => Promise<boolean>;
 }
+
+export type TUserRole = keyof typeof USER_ROLE;

@@ -1,4 +1,4 @@
-import httpStatus from "http-status";
+import httpStatus from "http-status-codes";
 import mongoose from "mongoose";
 import config from "../../../config";
 import AppError from "../../../errors/appError";
