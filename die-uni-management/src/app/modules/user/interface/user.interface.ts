@@ -23,6 +23,12 @@ export interface UserModel extends mongoose.Model<TUser> {
 
   //** check is user blocked or not*/
   isUserBlocked: (id: string) => Promise<boolean>;
+
+  //** revalidate jwt issued after password change
+  isJWTIssuedBeforePasswordChange: (
+    passwordChangeTimeStamp: Date,
+    jwtIssuedIAT: number,
+  ) => boolean;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

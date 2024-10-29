@@ -1,4 +1,5 @@
 // ********** IMPORTING PACKAGES**********************
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application } from "express";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
@@ -11,7 +12,12 @@ const app: Application = express();
 
 // ** Parser
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5173"],
+  }),
+);
+app.use(cookieParser());
 
 //** Routing
 app.get("/api/v1/check", async (req, res) => {

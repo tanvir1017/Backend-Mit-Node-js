@@ -22,4 +22,11 @@ router
     AuthController.changePasswordValidation,
   );
 
+router
+  .route("/refresh-token")
+  .post(
+    sanitizeClientDataViaZod(ValidateAuthUserViaZOD.refreshTokenValidation),
+    AuthController.refreshToken,
+  );
+
 export const AuthRoutes = router;

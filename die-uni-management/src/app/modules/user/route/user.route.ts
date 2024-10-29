@@ -23,7 +23,7 @@ router
 router
   .route("/create-faculty")
   .post(
-    authGuard(USER_ROLE.admin),
+    authGuard(USER_ROLE.admin, USER_ROLE.faculty),
     sanitizeClientDataViaZod(
       FacultyValidationViaZod.createFacultyValidationSchema,
     ),

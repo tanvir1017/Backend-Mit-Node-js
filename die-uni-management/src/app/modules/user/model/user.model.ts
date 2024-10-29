@@ -114,6 +114,19 @@ UserSchema.statics.isUserBlocked = async function (id: string) {
   return user?.status === "blocked" ? true : false;
 };
 
+UserSchema.statics.isJWTIssuedBeforePasswordChange = function (
+  passwordChangeTimeStamp: Date,
+  jwtIssuedIAT: number,
+) {
+  const passwordChangedAtInTime =
+    new Date(passwordChangeTimeStamp).getTime() / 1000;
+  console.log(
+    "🚀 ~ passwordChangedAtInTime > jwtIssuedIAT:",
+    passwordChangedAtInTime > jwtIssuedIAT,
+  );
+  return passwordChangedAtInTime > jwtIssuedIAT;
+};
+
 export const User = model<TUserInterface.TUser, TUserInterface.UserModel>(
   "User",
   UserSchema,

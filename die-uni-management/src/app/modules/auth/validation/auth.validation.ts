@@ -17,7 +17,15 @@ const validatePreUser = z.object({
   }),
 });
 
+const refreshTokenValidation = z.object({
+  cookies: z.object({
+    refreshToken: z.string({ required_error: "Refresh Token Is Required" }),
+    //accessToken: z.string({ required_error: "Access Token Is Required" }),
+  }),
+});
+
 export const ValidateAuthUserViaZOD = {
   validateLoginUser,
   validatePreUser,
+  refreshTokenValidation,
 };

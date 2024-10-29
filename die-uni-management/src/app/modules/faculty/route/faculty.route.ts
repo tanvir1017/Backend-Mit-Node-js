@@ -1,11 +1,18 @@
 import express from "express";
+import { authGuard } from "../../../middleware/auth";
 import sanitizeClientDataViaZod from "../../../middleware/sanitizeClientDataViaZod";
+import { USER_ROLE } from "../../user/constant/user.constant";
 import { FacultyControllers } from "../controller/faculty.controller";
 import { FacultyValidationViaZod } from "../validation/faculty.validation";
 
 const router = express.Router();
 
-router.route("/").get(FacultyControllers.getAllFaculties);
+router
+  .route("/all")
+  .get(
+    authGuard(USER_ROLE.admin, USER_ROLE.faculty),
+    FacultyControllers.getAllFaculties,
+  );
 
 router.route("/:id").get(FacultyControllers.getSingleFaculty);
 
