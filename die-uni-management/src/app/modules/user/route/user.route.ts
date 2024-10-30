@@ -30,11 +30,9 @@ router
     UserControllers.createFaculty,
   );
 
-router
-  .route("/create-admin")
-  .post(
-    authGuard(USER_ROLE.admin),
-    sanitizeClientDataViaZod(AdminValidationViaZod.createAdminValidationSchema),
-    UserControllers.createAdmin,
-  );
+router.route("/create-admin").post(
+  //authGuard(USER_ROLE.admin),
+  sanitizeClientDataViaZod(AdminValidationViaZod.createAdminValidationSchema),
+  UserControllers.createAdmin,
+);
 export const UserRoutes = router;

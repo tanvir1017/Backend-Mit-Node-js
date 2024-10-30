@@ -47,8 +47,21 @@ const refreshToken = asyncHandler(async (req, res) => {
     data: result, // returns the validated user data or an error message if the login fails.
   });
 });
+
+const forgetPassword = asyncHandler(async (req, res) => {
+  const userId = req.body.id;
+  const result = await AuthServices.forgetPassword(userId);
+
+  sendResponse(res, {
+    statuscode: 200,
+    success: true,
+    message: "Forget password link generated successfully", // returns a success message if the login is successful.
+    data: result, // returns the validated user data or an error message if the login fails.
+  });
+});
 export const AuthController = {
   loginValidation,
   changePasswordValidation,
   refreshToken,
+  forgetPassword,
 };

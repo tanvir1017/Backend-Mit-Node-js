@@ -28,6 +28,8 @@ const createStudentIntoDB = async (
   userData.password = password || (config.DEFAULT_PASS as string);
   //setting student role
   userData.role = "student";
+  //setting student email to user
+  userData.email = payload.email;
 
   // TODO => getting the semester data first
   const academicSemesterDetails = (await AcademicSemester.findById(
@@ -94,9 +96,12 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
    * make a custom generated id push into user as faculty
    * use transaction rollback
    */
-  const user: Partial<TUser> = {};
-  user.role = "faculty";
-  user.password = password ? password : config.DEFAULT_PASS;
+  const userData: Partial<TUser> = {};
+  userData.password = password ? password : config.DEFAULT_PASS;
+  //setting faculty email to user
+  userData.email = payload.email;
+  //setting faculty role
+  userData.role = "faculty";
 
   // TODO => starting session
   const session = await mongoose.startSession();
@@ -104,10 +109,10 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     // TODO => starting transaction session
     session.startTransaction();
 
-    user.id = await generateFacultyId();
+    userData.id = await generateFacultyId();
 
     // TODO => creating user with session | Transaction 01
-    const newFacultyUser = await User.create([user], { session }); // will return data into a array
+    const newFacultyUser = await User.create([userData], { session }); // will return data into a array
 
     if (!newFacultyUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create new user");
@@ -149,11 +154,13 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
-  //if password is not given , use deafult password
+  //if password is not given , use default password
   userData.password = password || (config.DEFAULT_PASS as string);
 
   //set student role
   userData.role = "admin";
+  //setting student email to user
+  userData.email = payload.email;
 
   const session = await mongoose.startSession();
 

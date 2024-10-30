@@ -157,8 +157,40 @@ const refreshTokenGenerate = async (token: string) => {
   };
 };
 
+const forgetPassword = async (userId: string) => {
+  const user = await User.isUserExistByCustomId(userId);
+
+  //* check if user exists in DB by id
+  if (!user) {
+    throw new AppError(StatusCodes.NOT_FOUND, "user doesn't exist");
+  }
+
+  //* check if the user is deleted(soft) or not
+  if (user.isDeleted) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      "User is not exist maybe deleted",
+    );
+  }
+
+  //* check if the user is blocked or not
+  if (user.status === "blocked") {
+    throw new AppError(StatusCodes.BAD_REQUEST, "User is blocked by admin");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+  const resetToken = createToken(jwtPayload, config.JWT_ACCESS_TOKEN!, "10m");
+  const resetUiLink = `${config.FRONTEND_DEV_ENV}?id=${user.id}&token=${resetToken}`;
+
+  console.log("🚀 ~ forgetPassword ~ resetUiLink:", resetUiLink);
+};
+
 export const AuthServices = {
   loginValidateUser,
   changeOldPassword,
   refreshTokenGenerate,
+  forgetPassword,
 };

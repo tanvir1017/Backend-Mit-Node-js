@@ -42,9 +42,9 @@ const createAdmin = asyncHandler(async (req, res) => {
   const result = await UserServices.createAdminIntoDB(password, adminData);
 
   sendResponse(res, {
-    statuscode: httpStatus.OK,
+    statuscode: httpStatus.CREATED,
     success: true,
-    message: "Admin is created succesfully",
+    message: "Admin is created successfully",
     data: result,
   });
 });

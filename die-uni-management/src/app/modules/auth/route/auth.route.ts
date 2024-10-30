@@ -29,4 +29,11 @@ router
     AuthController.refreshToken,
   );
 
+router
+  .route("/forget-password")
+  .post(
+    sanitizeClientDataViaZod(ValidateAuthUserViaZOD.forgetPasswordValidation),
+    AuthController.forgetPassword,
+  );
+
 export const AuthRoutes = router;
