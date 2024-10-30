@@ -1,4 +1,5 @@
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../../config";
 import AppError from "../../../errors/appError";
@@ -199,8 +200,37 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
+const getMeFromDB = async (payload: JwtPayload) => {
+  let result = null;
+  if (payload.role === "student") {
+    result = await StudentModel.findOne({ id: payload.userId }).populate(
+      "user",
+    );
+  } else if (payload.role === "admin") {
+    result = await Admin.findOne({ id: payload.userId }).populate("user");
+  } else {
+    result = await FacultyModel.findOne({ id: payload.userId }).populate(
+      "user",
+    );
+  }
+  return result;
+};
+
+const changeStatusOfAnUserFromDB = async (
+  id: string,
+  payload: Pick<TUser, "status">,
+) => {
+  if (!id) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Id must be provided");
+  }
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  getMeFromDB,
+  changeStatusOfAnUserFromDB,
 };

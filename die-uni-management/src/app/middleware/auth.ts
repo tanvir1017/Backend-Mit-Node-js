@@ -1,7 +1,8 @@
-import { StatusCodes } from "http-status-codes";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import AppError from "../errors/appError";
+import { verifyToken } from "../modules/auth/utils/auth.utils";
 import { TUserRole } from "../modules/user/interface/user.interface";
 import { User } from "../modules/user/model/user.model";
 import asyncHandler from "../utils/asyncHandler";
@@ -12,14 +13,11 @@ export const authGuard = (...requiredRole: TUserRole[]) =>
 
     //* if token is available or not
     if (!token) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, "Unauthorized user");
+      throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized user");
     }
 
     //* Verify token
-    const decoded = jwt.verify(
-      token,
-      config.JWT_ACCESS_TOKEN as string,
-    ) as JwtPayload;
+    const decoded = verifyToken(token, config.JWT_ACCESS_TOKEN as string);
 
     const { role, userId, iat } = decoded;
 
@@ -27,20 +25,20 @@ export const authGuard = (...requiredRole: TUserRole[]) =>
 
     //* check if user exists in DB by id
     if (!user) {
-      throw new AppError(StatusCodes.NOT_FOUND, "user doesn't exist");
+      throw new AppError(httpStatus.NOT_FOUND, "user doesn't exist");
     }
 
     //* check if the user is deleted(soft) or not
     if (user.isDeleted) {
       throw new AppError(
-        StatusCodes.NOT_FOUND,
+        httpStatus.NOT_FOUND,
         "User is not exist maybe deleted",
       );
     }
 
     //* check if the user is blocked or not
     if (user.status === "blocked") {
-      throw new AppError(StatusCodes.BAD_REQUEST, "User is blocked by admin");
+      throw new AppError(httpStatus.BAD_REQUEST, "User is blocked by admin");
     }
 
     if (
@@ -50,12 +48,12 @@ export const authGuard = (...requiredRole: TUserRole[]) =>
         iat as number,
       )
     ) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, "You are not authorized");
+      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
     }
     // verify role for authorization
     if (requiredRole && !requiredRole.includes(role)) {
       throw new AppError(
-        StatusCodes.UNAUTHORIZED,
+        httpStatus.UNAUTHORIZED,
         "You are not authorized by this role!",
       );
     }

@@ -30,9 +30,17 @@ const forgetPasswordValidation = z.object({
   }),
 });
 
+const resetPasswordValidation = z.object({
+  body: z.object({
+    id: z.string({ required_error: "User id is required!" }),
+    newPassword: z.string({ required_error: "Password must be provided" }),
+  }),
+});
+
 export const ValidateAuthUserViaZOD = {
   validateLoginUser,
   validatePreUser,
   refreshTokenValidation,
   forgetPasswordValidation,
+  resetPasswordValidation,
 };

@@ -1,3 +1,4 @@
+import httpStatus from "http-status-codes";
 import config from "../../../config";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
@@ -18,7 +19,7 @@ const loginValidation = asyncHandler(async (req, res) => {
   });
 
   sendResponse(res, {
-    statuscode: 200,
+    statuscode: httpStatus.OK,
     success: true,
     message: "User logged in successfully", // returns a success message if the login is successful.
     data: { needPasswordChange, accessToken }, // returns the validated user data or an error message if the login fails.
@@ -29,7 +30,7 @@ const changePasswordValidation = asyncHandler(async (req, res) => {
   const { ...passwordData } = req.body;
   const result = await AuthServices.changeOldPassword(req.user, passwordData);
   sendResponse(res, {
-    statuscode: 200,
+    statuscode: httpStatus.OK,
     success: true,
     message: "Password updated successfully", // returns a success message if the login is successful.
     data: result, // returns the validated user data or an error message if the login fails.
@@ -41,7 +42,7 @@ const refreshToken = asyncHandler(async (req, res) => {
   const result = await AuthServices.refreshTokenGenerate(refreshToken);
 
   sendResponse(res, {
-    statuscode: 200,
+    statuscode: httpStatus.OK,
     success: true,
     message: "Access token retrieve successfully", // returns a success message if the login is successful.
     data: result, // returns the validated user data or an error message if the login fails.
@@ -53,15 +54,29 @@ const forgetPassword = asyncHandler(async (req, res) => {
   const result = await AuthServices.forgetPassword(userId);
 
   sendResponse(res, {
-    statuscode: 200,
+    statuscode: httpStatus.OK,
     success: true,
     message: "Forget password link generated successfully", // returns a success message if the login is successful.
     data: result, // returns the validated user data or an error message if the login fails.
   });
 });
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const token = req.headers.authorization!;
+  const result = await AuthServices.resetPassword(req.body, token);
+
+  sendResponse(res, {
+    statuscode: httpStatus.OK,
+    success: true,
+    message: "Password rested", // returns a success message if the login is successful.
+    data: result, // returns the validated user data or an error message if the login fails.
+  });
+});
+
 export const AuthController = {
   loginValidation,
   changePasswordValidation,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };

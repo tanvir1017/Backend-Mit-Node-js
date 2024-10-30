@@ -49,8 +49,33 @@ const createAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+const getMe = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const result = await UserServices.getMeFromDB(user);
+
+  sendResponse(res, {
+    statuscode: httpStatus.OK,
+    success: true,
+    message: "I found myself successfully", // returns a success message if the login is successful.
+    data: result, // returns the validated user data or an error message if the login fails.
+  });
+});
+
+const changeStatus = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const result = await UserServices.changeStatusOfAnUserFromDB(id, req.body);
+
+  sendResponse(res, {
+    statuscode: httpStatus.OK,
+    success: true,
+    message: "Status changed successfully", // returns a success message if the login is successful.
+    data: result, // returns the validated user data or an error message if the login fails.
+  });
+});
 export const UserControllers = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
+  changeStatus,
 };

@@ -9,7 +9,7 @@ import { UserControllers } from "../controller/user.controller";
 
 const router = Router();
 
-// create-student route
+// TODO => create student
 router
   .route("/create-student")
   .post(
@@ -20,6 +20,7 @@ router
     UserControllers.createStudent,
   );
 
+// TODO => Create an faculty
 router
   .route("/create-faculty")
   .post(
@@ -30,9 +31,21 @@ router
     UserControllers.createFaculty,
   );
 
+// TODO => Create an admin
 router.route("/create-admin").post(
   //authGuard(USER_ROLE.admin),
   sanitizeClientDataViaZod(AdminValidationViaZod.createAdminValidationSchema),
   UserControllers.createAdmin,
 );
+
+// TODO => Find only yourself
+router
+  .route("/me")
+  .get(authGuard("student", "faculty", "admin"), UserControllers.getMe);
+
+// TODO => change user status
+router
+  .route("/:id/change-status")
+  .post(authGuard("admin"), UserControllers.changeStatus);
+
 export const UserRoutes = router;

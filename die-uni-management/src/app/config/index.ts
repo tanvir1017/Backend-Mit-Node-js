@@ -16,4 +16,8 @@ export default {
   JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN,
   FRONTEND_DEV_ENV: process.env.FRONTEND_DEV_ENV,
   FRONTEND_PRO_ENV: process.env.FRONTEND_PRO_ENV,
+  SMTP_PASS: process.env.SMTP_PASS,
+  SMTP_MAIL: process.env.SMTP_MAIL,
+  SMTP_HOST: process.env.SMTP_HOST,
+  SMTP_PORT: process.env.SMTP_PORT,
 };

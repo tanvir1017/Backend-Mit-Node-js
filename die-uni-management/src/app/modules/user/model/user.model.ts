@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import mongoose, { model } from "mongoose";
 
 import config from "../../../config";
+import { USER_STATUS } from "../constant/user.constant";
 import * as TUserInterface from "../interface/user.interface";
 
 const UserSchema = new mongoose.Schema<
@@ -42,7 +43,7 @@ const UserSchema = new mongoose.Schema<
     status: {
       type: String,
       enum: {
-        values: ["in-progress", "blocked"],
+        values: USER_STATUS,
         message: "{VALUE} is not a valid status",
       },
       default: "in-progress",
