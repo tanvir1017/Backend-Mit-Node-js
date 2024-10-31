@@ -1,17 +1,17 @@
 import httpStatus from "http-status-codes";
-import AppError from "../../../errors/appError";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
 import { UserServices } from "../service/user.service";
 
 // TODO   =>  Student creation controller
 const createStudent = asyncHandler(async (req, res) => {
-  const { password, student: studentData } = req.body;
+  const file = req.file;
+  const { student: studentData } = req.body;
 
-  const result = await UserServices.createStudentIntoDB(password, studentData);
-  if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Failed to create new student");
-  }
+  const result = await UserServices.createStudentIntoDB(
+    file as Express.Multer.File,
+    studentData,
+  );
 
   // Send response
   sendResponse(res, {
@@ -23,11 +23,13 @@ const createStudent = asyncHandler(async (req, res) => {
 });
 
 const createFaculty = asyncHandler(async (req, res) => {
-  const { password, faculty } = req.body;
-  const result = await UserServices.createFacultyIntoDB(password, faculty);
-  if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Failed to create new Faculty");
-  }
+  const file = req.file;
+  const { faculty } = req.body;
+  const result = await UserServices.createFacultyIntoDB(
+    file as Express.Multer.File,
+    faculty,
+  );
+
   sendResponse(res, {
     statuscode: httpStatus.CREATED,
     success: true,
@@ -37,9 +39,13 @@ const createFaculty = asyncHandler(async (req, res) => {
 });
 
 const createAdmin = asyncHandler(async (req, res) => {
-  const { password, admin: adminData } = req.body;
+  const file = req.file;
+  const { admin: adminData } = req.body;
 
-  const result = await UserServices.createAdminIntoDB(password, adminData);
+  const result = await UserServices.createAdminIntoDB(
+    file as Express.Multer.File,
+    adminData,
+  );
 
   sendResponse(res, {
     statuscode: httpStatus.CREATED,
@@ -49,6 +55,7 @@ const createAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+// Todo => Get me route
 const getMe = asyncHandler(async (req, res) => {
   const user = req.user;
   const result = await UserServices.getMeFromDB(user);
@@ -61,6 +68,7 @@ const getMe = asyncHandler(async (req, res) => {
   });
 });
 
+// Todo => change user status controller
 const changeStatus = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const result = await UserServices.changeStatusOfAnUserFromDB(id, req.body);

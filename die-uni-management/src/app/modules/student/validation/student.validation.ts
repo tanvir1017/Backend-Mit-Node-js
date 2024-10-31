@@ -40,7 +40,8 @@ const createStudentSchemaValidation = z.object({
     password: z
       .string()
       .max(20, { message: "Password can't be more than 20 characters" })
-      .trim(),
+      .trim()
+      .optional(),
     student: z.object({
       name: createUserNameValidationSchema,
       age: z.number().min(1, "Age must be a positive number"),

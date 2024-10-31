@@ -3,10 +3,12 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../../config";
 import AppError from "../../../errors/appError";
+import sendImgToCloudinary from "../../../utils/image-upload";
 import { TAcademicSemester } from "../../academic-semester/interface/academicSemester.interface";
 import { AcademicSemester } from "../../academic-semester/model/academicSemester.model";
+import * as AdminInterface from "../../admin/interface/admin.interface";
 import { Admin } from "../../admin/model/admin.model";
-import { TFaculty } from "../../faculty/interface/faculty.interface";
+import * as FacultyInterface from "../../faculty/interface/faculty.interface";
 import { FacultyModel } from "../../faculty/model/faculty.model";
 import { generateFacultyId } from "../../faculty/utils/faculty.utils";
 import * as StudentInterface from "../../student/interface/student.interface";
@@ -17,7 +19,7 @@ import { generateAdminId, generatedID } from "../utils/generateID";
 
 // TODO => Creating a new student to DB
 const createStudentIntoDB = async (
-  password: string,
+  file: Express.Multer.File,
   payload: StudentInterface.TStudent,
 ) => {
   //const modeInstance = new StudentModel(student);
@@ -26,7 +28,7 @@ const createStudentIntoDB = async (
   // creating user object
   const userData: Partial<TUser> = {};
 
-  userData.password = password || (config.DEFAULT_PASS as string);
+  userData.password = config.DEFAULT_PASS as string;
   //setting student role
   userData.role = "student";
   //setting student email to user
@@ -57,9 +59,15 @@ const createStudentIntoDB = async (
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create user");
     }
 
+    // uploading img into cloudinary
+    const imageName = `${(payload.name.firstName + " " + payload.name?.middleName + " " + +payload.name.lastName).split(" ").join("")}-${userData.id}`;
+    const imagePath = file.path;
+    const imgUploader = await sendImgToCloudinary(imagePath, imageName);
+
     // set id and user = _id to student object
     payload.id = newUser[0].id; // embedded id
     payload.user = newUser[0]._id; // ref _Id
+    payload.profileImage = imgUploader.secure_url;
 
     // TODO => creating student with session Transaction 01
     const newStudent = await StudentModel.create([payload], { session });
@@ -87,8 +95,10 @@ const createStudentIntoDB = async (
 };
 
 // TODO => creating new faculty into DB
-
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+  file: Express.Multer.File,
+  payload: FacultyInterface.TFaculty,
+) => {
   /**
    * First grave all the data about faculty by payload
    * create a user
@@ -98,7 +108,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
    * use transaction rollback
    */
   const userData: Partial<TUser> = {};
-  userData.password = password ? password : config.DEFAULT_PASS;
+  userData.password = config.DEFAULT_PASS;
   //setting faculty email to user
   userData.email = payload.email;
   //setting faculty role
@@ -112,6 +122,11 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
     userData.id = await generateFacultyId();
 
+    // uploading img into cloudinary
+    const imageName = `${(payload.name.firstName + " " + payload.name?.middleName + " " + +payload.name.lastName).split(" ").join("")}-${userData.id}`;
+    const imagePath = file.path;
+    const imgUploader = await sendImgToCloudinary(imagePath, imageName);
+
     // TODO => creating user with session | Transaction 01
     const newFacultyUser = await User.create([userData], { session }); // will return data into a array
 
@@ -123,6 +138,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
     payload.id = newFacultyUser[0].id; // faculty userId embedded to facultyId
     payload.user = newFacultyUser[0]._id; // faculty user _id embedded to faculty user property
+    payload.profileImage = imgUploader?.secure_url; // injecting uploaded img file
 
     const newFaculty = await FacultyModel.create([payload], { session }); // injecting transaction session into creating faculty
 
@@ -151,12 +167,16 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
-const createAdminIntoDB = async (password: string, payload: TFaculty) => {
+// TODO =>  create Admin into db along side by creating a user
+const createAdminIntoDB = async (
+  file: Express.Multer.File,
+  payload: AdminInterface.TAdmin,
+) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
   //if password is not given , use default password
-  userData.password = password || (config.DEFAULT_PASS as string);
+  userData.password = config.DEFAULT_PASS as string;
 
   //set student role
   userData.role = "admin";
@@ -178,9 +198,16 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to create admin");
     }
+
+    // uploading img into cloudinary
+    const imageName = `${(payload.name.firstName + " " + payload.name?.middleName + " " + +payload.name.lastName).split(" ").join("")}-${userData.id}`;
+    const imagePath = file?.path;
+    const imgUploader = await sendImgToCloudinary(imagePath, imageName);
+
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
+    payload.profileImg = imgUploader?.secure_url; // injecting uploaded file
 
     // create a admin (transaction-2)
     const newAdmin = await Admin.create([payload], { session });
@@ -200,6 +227,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
+// TODO =>  get individual information by them self
 const getMeFromDB = async (payload: JwtPayload) => {
   let result = null;
   if (payload.role === "student") {
@@ -216,6 +244,7 @@ const getMeFromDB = async (payload: JwtPayload) => {
   return result;
 };
 
+// TODO => change user status from admin only
 const changeStatusOfAnUserFromDB = async (
   id: string,
   payload: Pick<TUser, "status">,

@@ -11,7 +11,7 @@ export type TFacultyName = {
 export type TFaculty = {
   id: string;
   user: Types.ObjectId;
-  name: TFaculty;
+  name: TFacultyName;
   email: string;
   gender: T_GENDER_COMMON__TYPE;
   dateOfBirth: string;

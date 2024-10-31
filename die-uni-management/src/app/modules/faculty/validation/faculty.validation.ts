@@ -17,10 +17,6 @@ const createFacultyNameValidationSchema = z.object({
 //***************** CREATE VALIDATION SCHEMA FOR FACULTY *****************************
 const createFacultyValidationSchema = z.object({
   body: z.object({
-    password: z
-      .string()
-      .max(20, "Password can't be longer than 20 characters")
-      .trim(),
     faculty: z.object({
       name: createFacultyNameValidationSchema,
       email: z.string().email("Please provide a valid email address").trim(),
