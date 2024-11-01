@@ -9,7 +9,6 @@ import { PasswordData, TLoginUser } from "../interface/auth.interface";
 import { createToken, verifyToken } from "../utils/auth.utils";
 
 // TODO => validate BLOCK | WRONG PASSWORD | EXISTENCE of an user
-
 const validateBlockPasswordExistenceOfAnUser = async (userId: string) => {};
 
 // TODO: Implement function to validate user credentials
@@ -61,6 +60,7 @@ const loginValidateUser = async (payload: TLoginUser) => {
   };
 };
 
+// TODO => Change password implementation
 const changeOldPassword = async (
   userData: JwtPayload,
   payload: PasswordData,
@@ -107,6 +107,7 @@ const changeOldPassword = async (
   return null;
 };
 
+// TODO => Refresh token generation
 const refreshTokenGenerate = async (token: string) => {
   //* Verify token
   const decoded = verifyToken(token, config.JWT_REFRESH_TOKEN as string);
@@ -152,6 +153,7 @@ const refreshTokenGenerate = async (token: string) => {
   };
 };
 
+// TODO => Forget Password
 const forgetPassword = async (userId: string) => {
   const user = await User.isUserExistByCustomId(userId);
 
@@ -181,6 +183,7 @@ const forgetPassword = async (userId: string) => {
   sendEmail(user.email, resetUiLink);
 };
 
+// TODO => Reset Password
 const resetPassword = async (
   payload: { id: string; newPassword: string },
   token: string,

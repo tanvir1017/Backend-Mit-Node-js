@@ -32,4 +32,12 @@ export interface UserModel extends mongoose.Model<TUser> {
   ) => boolean;
 }
 
+export type WithName = {
+  name: {
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+  };
+};
+
 export type TUserRole = keyof typeof USER_ROLE;

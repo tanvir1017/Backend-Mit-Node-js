@@ -120,16 +120,13 @@ UserSchema.statics.isUserBlocked = async function (id: string) {
   return user?.status === "blocked" ? true : false;
 };
 
+// TODO => check if the iat of jwt is issued before password change
 UserSchema.statics.isJWTIssuedBeforePasswordChange = function (
   passwordChangeTimeStamp: Date,
   jwtIssuedIAT: number,
 ) {
   const passwordChangedAtInTime =
     new Date(passwordChangeTimeStamp).getTime() / 1000;
-  console.log(
-    "🚀 ~ passwordChangedAtInTime > jwtIssuedIAT:",
-    passwordChangedAtInTime > jwtIssuedIAT,
-  );
   return passwordChangedAtInTime > jwtIssuedIAT;
 };
 
