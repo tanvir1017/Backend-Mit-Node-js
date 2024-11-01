@@ -19,6 +19,22 @@ const createEnrolledCourse = asyncHandler(async (req, res) => {
   });
 });
 
+// update enrolled course marks
+const updateEnrolledCourseMark = asyncHandler(async (req, res) => {
+  const faculty = req.user;
+
+  const result = await EnrolledCourseServices.updateEnrolledCourseMarksIntoDB(
+    faculty,
+    req.body,
+  );
+  sendResponse(res, {
+    statuscode: httpStatusCode.OK,
+    success: true,
+    message: "Marks updated successfully",
+    data: result,
+  });
+});
+
 // get all enrolled courses
 const getAllEnrolledCourse = asyncHandler(async (req, res) => {});
 
@@ -37,4 +53,5 @@ export const EnrolledCourseControllers = {
   getSingleEnrolledCourse,
   updateEnrolledCourse,
   deleteEnrolledCourse,
+  updateEnrolledCourseMark,
 };

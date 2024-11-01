@@ -3,9 +3,11 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import AppError from "../../../errors/appError";
 import { CourseModel } from "../../course/model/course.model";
+import { FacultyModel } from "../../faculty/model/faculty.model";
 import OfferCourseModel from "../../offered-course/model/offered-course.model";
 import { SemesterRegistrationModel } from "../../semester-registration/model/semester-registration.model";
 import StudentModel from "../../student/model/student.model";
+import { TEnrolledCourse } from "../interface/enrolled-course.interface";
 import EnrolledCourseModel from "../model/enrolled-course.model";
 
 const createEnrolledCourseIntoDB = async (
@@ -176,6 +178,75 @@ const createEnrolledCourseIntoDB = async (
   }
 };
 
+const updateEnrolledCourseMarksIntoDB = async (
+  faculty: JwtPayload,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+
+  const isSemesterRegistrationExist =
+    await SemesterRegistrationModel.findById(semesterRegistration);
+  if (!isSemesterRegistrationExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Semester registration not found");
+  }
+
+  //** checking is student exist or not
+  const isStudentExist = await StudentModel.findById(student);
+  if (!isStudentExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Student not found");
+  }
+
+  //**  Checking if the offered course exist
+  const isOfferedCourseExist = await OfferCourseModel.findById(offeredCourse);
+  if (!isOfferedCourseExist) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Offered Course does not exist");
+  }
+
+  //**  Checking if the faculty exist or not
+  const getFacultyByTokenUserId = await FacultyModel.findOne(
+    {
+      id: faculty.userId,
+    },
+    { _id: true }, // field filtering
+  );
+  if (!getFacultyByTokenUserId) {
+    throw new AppError(httpStatus.NOT_FOUND, "Faculty is not found");
+  }
+
+  const isCourseBelongToThisFaculty = await EnrolledCourseModel.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: getFacultyByTokenUserId._id,
+  });
+
+  if (!isCourseBelongToThisFaculty) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not allowed to update the mark",
+    );
+  }
+
+  const modifiedData: Record<string, unknown> = {
+    ...courseMarks,
+  };
+
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourseModel.findByIdAndUpdate(
+    isCourseBelongToThisFaculty?._id,
+    modifiedData,
+    { new: true, runValidators: true },
+  );
+
+  return result;
+};
+
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
+  updateEnrolledCourseMarksIntoDB,
 };
