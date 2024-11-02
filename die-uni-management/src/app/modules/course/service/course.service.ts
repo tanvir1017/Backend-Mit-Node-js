@@ -31,8 +31,12 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
     .fieldLimiting();
 
   const result = await courseQuery.modelQuery;
+  const meta = await courseQuery.countTotal();
 
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
 // TODO => Get single course from the database

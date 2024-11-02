@@ -1,1 +1,1 @@
-export const courseSearchAbleFields: string[] = ["title", "prefix", "code"];
+export const courseSearchAbleFields: string[] = ["title", "prefix"];

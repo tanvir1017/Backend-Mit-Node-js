@@ -91,7 +91,7 @@ const enrolledCourseMongooseSchema = new mongoose.Schema<TEnrolledCourse>({
     enum: Grade,
     default: "N/A",
   },
-  gradPoints: {
+  gradePoints: {
     type: Number,
     min: 0,
     max: 4,

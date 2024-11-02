@@ -9,6 +9,7 @@ import { SemesterRegistrationModel } from "../../semester-registration/model/sem
 import StudentModel from "../../student/model/student.model";
 import { TEnrolledCourse } from "../interface/enrolled-course.interface";
 import EnrolledCourseModel from "../model/enrolled-course.model";
+import totalGradAndGradePointsCountUtils from "../utils/total-grade-count";
 
 const createEnrolledCourseIntoDB = async (
   user: JwtPayload,
@@ -230,6 +231,21 @@ const updateEnrolledCourseMarksIntoDB = async (
   const modifiedData: Record<string, unknown> = {
     ...courseMarks,
   };
+
+  if (courseMarks?.finalExam) {
+    const { classTest1, classTest2, midTerm, finalExam } =
+      isCourseBelongToThisFaculty.courseMarks;
+    const totalMarks =
+      Math.ceil(classTest1 * 0.1) +
+      Math.ceil(midTerm * 0.3) +
+      Math.ceil(classTest2 * 0.1) +
+      Math.ceil(finalExam * 0.5);
+
+    const result = totalGradAndGradePointsCountUtils(totalMarks);
+    modifiedData.grade = result.grade;
+    modifiedData.gradePoints = result.gradePoints;
+    modifiedData.isCompleted = true;
+  }
 
   if (courseMarks && Object.keys(courseMarks).length) {
     for (const [key, value] of Object.entries(courseMarks)) {
