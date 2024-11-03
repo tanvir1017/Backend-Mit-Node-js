@@ -31,7 +31,6 @@ const createFacultyValidationSchema = z.object({
       emergencyContactNo: z.string().trim(),
       presentAddress: z.string().trim(),
       permanentAddress: z.string().trim(),
-      academicFaculty: z.string().trim(),
       academicDepartment: z.string().trim(),
       profileImage: z.string().trim().optional(),
       bloodGroup: z.enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"], {

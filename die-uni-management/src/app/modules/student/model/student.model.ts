@@ -175,6 +175,7 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
     },
     profileImage: {
       type: String,
+      default: "",
     },
     admissionSemester: {
       type: mongoose.Schema.Types.ObjectId,
@@ -183,6 +184,10 @@ const StudentSchema = new mongoose.Schema<StudentInterface.TStudent>(
     academicDepartment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AcademicDepartment",
+    },
+    academicFaculty: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AcademicFaculty",
     },
     localGuardian: {
       type: LocalGuardianSchema,

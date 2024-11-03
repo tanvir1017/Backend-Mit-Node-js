@@ -29,7 +29,6 @@ export const FacultyControllers = {
   getSingleFaculty: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { user } = req;
-    console.log("🚀 ~ getSingleFaculty:asyncHandler ~ user:", user);
 
     if (!id) {
       throw new AppError(httpStatus.BAD_REQUEST, "Faculty ID required");
@@ -113,7 +112,7 @@ export const FacultyControllers = {
     sendResponse(res, {
       statuscode: httpStatus.OK,
       success: true,
-      message: "faculty delete sucessfull",
+      message: "faculty delete successfully",
       data: result,
     });
   }),

@@ -1,8 +1,9 @@
-import httpStatus from "http-status-codes";
+import httpStatus, { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import env from "../../../config";
 import AppError from "../../../errors/appError";
+import { AcademicDepartment } from "../../academic-department/model/academic-department.model";
 import { TAcademicSemester } from "../../academic-semester/interface/academicSemester.interface";
 import { AcademicSemester } from "../../academic-semester/model/academicSemester.model";
 import * as AdminInterface from "../../admin/interface/admin.interface";
@@ -39,7 +40,13 @@ const createStudentIntoDB = async (
     payload.admissionSemester,
   )) as TAcademicSemester;
 
-  // Transactions and Rollback
+  // todo => get faculty from academic departments
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+  if (!academicDepartment) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Academic department not found");
+  }
 
   // TODO =>  Make isolated environments by creating new sessions
 
@@ -60,16 +67,20 @@ const createStudentIntoDB = async (
     }
 
     // uploading img into cloudinary
-    const imageUploader = await constructUrlAndImageUploaderUtil(
-      payload,
-      file,
-      userData,
-    );
+    if (file) {
+      const imageUploader = await constructUrlAndImageUploaderUtil(
+        payload,
+        file,
+        userData,
+      );
+
+      payload.profileImage = imageUploader.secure_url;
+    }
 
     // set id and user = _id to student object
     payload.id = newUser[0].id; // embedded id
     payload.user = newUser[0]._id; // ref _Id
-    payload.profileImage = imageUploader.secure_url;
+    payload.academicFaculty = academicDepartment.academicFaculty;
 
     // TODO => creating student with session Transaction 01
     const newStudent = await StudentModel.create([payload], { session });
@@ -116,6 +127,15 @@ const createFacultyIntoDB = async (
   //setting faculty role
   userData.role = "faculty";
 
+  const findAcademicFacultyFromDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+  if (!findAcademicFacultyFromDepartment) {
+    throw new AppError(httpStatus.NOT_FOUND, "Academic department not found");
+  }
+
+  payload.academicFaculty = findAcademicFacultyFromDepartment.academicFaculty;
+
   // TODO => starting session
   const session = await mongoose.startSession();
   try {
@@ -124,12 +144,14 @@ const createFacultyIntoDB = async (
 
     userData.id = await generateFacultyId();
 
-    // uploading img into cloudinary
-    const imageUploader = await constructUrlAndImageUploaderUtil(
-      payload,
-      file,
-      userData,
-    );
+    if (file) {
+      const imageUploader = await constructUrlAndImageUploaderUtil(
+        payload,
+        file,
+        userData,
+      );
+      payload.profileImage = imageUploader.secure_url;
+    }
 
     // TODO => creating user with session | Transaction 01
     const newFacultyUser = await User.create([userData], { session }); // will return data into a array
@@ -142,7 +164,6 @@ const createFacultyIntoDB = async (
 
     payload.id = newFacultyUser[0].id; // faculty userId embedded to facultyId
     payload.user = newFacultyUser[0]._id; // faculty user _id embedded to faculty user property
-    payload.profileImage = imageUploader?.secure_url; // injecting uploaded img file
 
     const newFaculty = await FacultyModel.create([payload], { session }); // injecting transaction session into creating faculty
 
@@ -196,7 +217,6 @@ const createAdminIntoDB = async (
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session });
-    console.log(newUser);
 
     //create a admin
     if (!newUser.length) {
@@ -204,16 +224,18 @@ const createAdminIntoDB = async (
     }
 
     // uploading img into cloudinary
-    const imageUploader = await constructUrlAndImageUploaderUtil(
-      payload,
-      file,
-      userData,
-    );
+    if (file) {
+      const imageUploader = await constructUrlAndImageUploaderUtil(
+        payload,
+        file,
+        userData,
+      );
+      payload.profileImg = imageUploader.secure_url; // injecting uploaded file
+    }
 
     // set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = imageUploader?.secure_url; // injecting uploaded file
 
     // create a admin (transaction-2)
     const newAdmin = await Admin.create([payload], { session });

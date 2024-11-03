@@ -1,5 +1,7 @@
 import express from "express";
+import { authGuard } from "../../../middleware/auth";
 import sanitizeClientDataViaZod from "../../../middleware/sanitizeClientDataViaZod";
+import { USER_ROLE } from "../../user/constant/user.constant";
 import { AcademicSemesterControllers } from "../controller/academicSemester.controller";
 import { AcademicSemesterValidationZOD } from "../validation/academicSemester.validation";
 
@@ -15,15 +17,25 @@ router.route("/create-academic-semester").post(
 );
 
 // TODO => get all academic semester route
-router.route("/all").get(AcademicSemesterControllers.getallAcademicSemesters);
+router
+  .route("/all")
+  .get(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+    AcademicSemesterControllers.getallAcademicSemesters,
+  );
 
 // TODO => get only single academic semester route
 router
   .route("/:semesterID")
-  .get(AcademicSemesterControllers.getSingleAcademicSemester);
+
+  .get(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+    AcademicSemesterControllers.getSingleAcademicSemester,
+  );
 
 // TODO => update academic semester route
 router.route("/:semesterID/update-academic-semester").patch(
+  authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
   // validator middleware called sanitizedClient
   sanitizeClientDataViaZod(
     AcademicSemesterValidationZOD.updateAcademicSemesterValidation,

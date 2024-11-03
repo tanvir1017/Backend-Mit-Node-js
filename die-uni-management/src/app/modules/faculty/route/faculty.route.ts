@@ -14,13 +14,24 @@ router
     FacultyControllers.getAllFaculties,
   );
 
-router.route("/:id").get(FacultyControllers.getSingleFaculty);
+router
+  .route("/:id")
+  .get(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+    FacultyControllers.getSingleFaculty,
+  );
 
-router.route("/:id/delete").delete(FacultyControllers.deleteFaculty);
+router
+  .route("/:id/delete")
+  .delete(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
+    FacultyControllers.deleteFaculty,
+  );
 
 router
   .route("/:id/update")
   .patch(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
     sanitizeClientDataViaZod(
       FacultyValidationViaZod.updateFacultyValidationSchema,
     ),

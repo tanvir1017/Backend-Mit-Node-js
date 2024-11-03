@@ -1,5 +1,7 @@
 import { Router } from "express";
+import { authGuard } from "../../../middleware/auth";
 import sanitizeClientDataViaZod from "../../../middleware/sanitizeClientDataViaZod";
+import { USER_ROLE } from "../../user/constant/user.constant";
 import { AcademicDepartmentControllers } from "../controller/academic-department.controller";
 import { AcademicDepartmentValidationViaZOD } from "../validation/academic-department.validation";
 
@@ -16,6 +18,7 @@ router
 router
   .route("/create")
   .post(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
     sanitizeClientDataViaZod(
       AcademicDepartmentValidationViaZOD.createAcademicDepartmentValidationSchema,
     ),

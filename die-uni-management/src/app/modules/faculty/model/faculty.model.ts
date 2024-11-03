@@ -90,6 +90,7 @@ const FacultySchema = new mongoose.Schema<FacultyInterface.TFaculty>(
     },
     profileImage: {
       type: String,
+      default: "",
     },
     bloodGroup: {
       type: String,

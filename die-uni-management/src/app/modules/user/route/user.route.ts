@@ -14,7 +14,7 @@ const router = Router();
 // TODO => create student
 router.route("/create-student").post(
   // ? Authguard will authorize user role
-  authGuard(USER_ROLE.admin),
+  authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
   // ? upload the file via multer to /public/uploads folder for temporary basis
   upload.single("file"),
   // ? will parse the for data into Json
@@ -29,7 +29,7 @@ router.route("/create-student").post(
 
 // TODO => Create an faculty
 router.route("/create-faculty").post(
-  authGuard(USER_ROLE.admin, USER_ROLE.faculty),
+  authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
   // ? upload the file via multer to /public/uploads folder for temporary basis
   upload.single("file"),
   // ? will parse the for data into Json
@@ -43,6 +43,7 @@ router.route("/create-faculty").post(
 
 // TODO => Create an admin
 router.route("/create-admin").post(
+  authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
   // ? upload the file via multer to /public/uploads folder for temporary basis
   upload.single("file"),
   // ? will parse the for data into Json
@@ -55,11 +56,14 @@ router.route("/create-admin").post(
 // TODO => Find only yourself
 router
   .route("/me")
-  .get(authGuard("student", "faculty", "admin"), UserControllers.getMe);
+  .get(
+    authGuard("student", "faculty", "admin", "superAdmin"),
+    UserControllers.getMe,
+  );
 
 // TODO => change user status
 router
   .route("/:id/change-status")
-  .post(authGuard("admin"), UserControllers.changeStatus);
+  .post(authGuard("admin", "superAdmin"), UserControllers.changeStatus);
 
 export const UserRoutes = router;
