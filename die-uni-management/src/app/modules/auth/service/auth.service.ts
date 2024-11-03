@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import config from "../../../config";
+import env from "../../../config";
 import AppError from "../../../errors/appError";
 import { sendEmail } from "../../../utils/send-email";
 import { User } from "../../user/model/user.model";
@@ -43,14 +43,14 @@ const loginValidateUser = async (payload: TLoginUser) => {
 
   const accessToken = createToken(
     jwtPayload,
-    config.JWT_ACCESS_TOKEN as string,
-    config.JWT_ACCESS_EXPIRES_IN as string,
+    env.JWT_ACCESS_TOKEN as string,
+    env.JWT_ACCESS_EXPIRES_IN as string,
   );
 
   const refreshToken = createToken(
     jwtPayload,
-    config.JWT_REFRESH_TOKEN as string,
-    config.JWT_REFRESH_EXPIRES_IN as string,
+    env.JWT_REFRESH_TOKEN as string,
+    env.JWT_REFRESH_EXPIRES_IN as string,
   );
 
   return {
@@ -91,7 +91,7 @@ const changeOldPassword = async (
   // TODO => Hash new password
   const newHashedPassword = await bcrypt.hash(
     payload.newPassword,
-    Number(config.BCRYPT_SALT),
+    Number(env.BCRYPT_SALT_ROUNDS),
   );
 
   const result = await User.findOneAndUpdate(
@@ -110,7 +110,7 @@ const changeOldPassword = async (
 // TODO => Refresh token generation
 const refreshTokenGenerate = async (token: string) => {
   //* Verify token
-  const decoded = verifyToken(token, config.JWT_REFRESH_TOKEN as string);
+  const decoded = verifyToken(token, env.JWT_REFRESH_TOKEN as string);
 
   const { userId, iat } = decoded;
 
@@ -144,8 +144,8 @@ const refreshTokenGenerate = async (token: string) => {
   };
   const accessToken = createToken(
     jwtPayload,
-    config.JWT_ACCESS_TOKEN!,
-    config.JWT_ACCESS_EXPIRES_IN!,
+    env.JWT_ACCESS_TOKEN!,
+    env.JWT_ACCESS_EXPIRES_IN!,
   );
 
   return {
@@ -176,9 +176,9 @@ const forgetPassword = async (userId: string) => {
     userId: user.id,
     role: user.role,
   };
-  const resetToken = createToken(jwtPayload, config.JWT_ACCESS_TOKEN!, "10m");
+  const resetToken = createToken(jwtPayload, env.JWT_ACCESS_TOKEN!, "10m");
 
-  const resetUiLink = `${config.FRONTEND_DEV_ENV}?id=${user.id}&token=${resetToken}`;
+  const resetUiLink = `${env.FRONTEND_DEV_ENV}?id=${user.id}&token=${resetToken}`;
 
   sendEmail(user.email, resetUiLink);
 };
@@ -206,7 +206,7 @@ const resetPassword = async (
   }
 
   //* verify token
-  const decoded = verifyToken(token, config.JWT_ACCESS_TOKEN!);
+  const decoded = verifyToken(token, env.JWT_ACCESS_TOKEN!);
   if (decoded && decoded.userId !== payload.id) {
     throw new AppError(httpStatus.FORBIDDEN, "Forbidden user!");
   }
@@ -214,7 +214,7 @@ const resetPassword = async (
   // TODO => Hash new password
   const newHashedPassword = await bcrypt.hash(
     payload.newPassword,
-    Number(config.BCRYPT_SALT),
+    Number(env.BCRYPT_SALT_ROUNDS),
   );
 
   await User.findOneAndUpdate(

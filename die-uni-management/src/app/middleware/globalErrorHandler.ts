@@ -1,6 +1,6 @@
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
-import config from "../config";
+import env from "../config";
 import AppError from "../errors/appError";
 import handleCastError from "../errors/castError";
 import handleDuplicity from "../errors/duplicateError";
@@ -70,7 +70,7 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, __next) => {
     message,
     errorSources,
     //error,
-    stack: config.NODE_ENV !== "production" ? error?.stack : null,
+    stack: env.isProd ? null : error?.stack, // is env === dev then it will print error
   });
 };
 

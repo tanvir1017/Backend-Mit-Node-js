@@ -1,7 +1,7 @@
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
-import config from "../../../config";
+import env from "../../../config";
 import AppError from "../../../errors/appError";
 import { TAcademicSemester } from "../../academic-semester/interface/academicSemester.interface";
 import { AcademicSemester } from "../../academic-semester/model/academicSemester.model";
@@ -28,7 +28,7 @@ const createStudentIntoDB = async (
   // creating user object
   const userData: Partial<TUser> = {};
 
-  userData.password = config.DEFAULT_PASS as string;
+  userData.password = env.DEFAULT_PASS as string;
   //setting student role
   userData.role = "student";
   //setting student email to user
@@ -110,7 +110,7 @@ const createFacultyIntoDB = async (
    * use transaction rollback
    */
   const userData: Partial<TUser> = {};
-  userData.password = config.DEFAULT_PASS;
+  userData.password = env.DEFAULT_PASS;
   //setting faculty email to user
   userData.email = payload.email;
   //setting faculty role
@@ -180,7 +180,7 @@ const createAdminIntoDB = async (
   const userData: Partial<TUser> = {};
 
   //if password is not given , use default password
-  userData.password = config.DEFAULT_PASS as string;
+  userData.password = env.DEFAULT_PASS as string;
 
   //set student role
   userData.role = "admin";

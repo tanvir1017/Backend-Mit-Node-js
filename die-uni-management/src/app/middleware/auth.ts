@@ -1,6 +1,6 @@
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
-import config from "../config";
+import env from "../config";
 import AppError from "../errors/appError";
 import { verifyToken } from "../modules/auth/utils/auth.utils";
 import { TUserRole } from "../modules/user/interface/user.interface";
@@ -17,7 +17,7 @@ export const authGuard = (...requiredRole: TUserRole[]) =>
     }
 
     //* Verify token
-    const decoded = verifyToken(token, config.JWT_ACCESS_TOKEN as string);
+    const decoded = verifyToken(token, env.JWT_ACCESS_TOKEN as string);
 
     const { role, userId, iat } = decoded;
 

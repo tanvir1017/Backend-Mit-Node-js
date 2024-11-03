@@ -1,16 +1,16 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
-import config from "./app/config/index";
+import env from "./app/config";
 
 let server: Server;
 
 async function main() {
   try {
-    await mongoose.connect(config.ATLAS_URI as string);
+    await mongoose.connect(env.DATABASE_URL as string);
     // Listener
-    server = app.listen(config.PORT, () => {
-      console.log(`Server running on port ${config.PORT}`);
+    server = app.listen(env.PORT, () => {
+      console.log(`Server running on port ${env.PORT}`);
     });
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);

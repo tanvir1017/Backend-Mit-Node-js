@@ -1,5 +1,5 @@
 import httpStatus from "http-status-codes";
-import config from "../../../config";
+import env from "../../../config";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
 import { AuthServices } from "../service/auth.service";
@@ -10,11 +10,11 @@ const loginValidation = asyncHandler(async (req, res) => {
   const { refreshToken, accessToken, needPasswordChange } = result;
 
   res.cookie("refreshToken", refreshToken, {
-    secure: config.NODE_ENV !== "development",
+    secure: env.isProd,
     httpOnly: true,
   });
   res.cookie("accessToken", accessToken, {
-    secure: config.NODE_ENV !== "development",
+    secure: env.isDev,
     httpOnly: true,
   });
 

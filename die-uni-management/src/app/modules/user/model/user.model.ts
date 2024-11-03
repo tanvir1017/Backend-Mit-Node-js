@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose, { model } from "mongoose";
 
-import config from "../../../config";
+import env from "../../../config";
 import { USER_STATUS } from "../constant/user.constant";
 import * as TUserInterface from "../interface/user.interface";
 
@@ -65,7 +65,10 @@ UserSchema.pre("save", async function (next) {
 
   // TODO => hashing function to has password
   const user = this; // currently processable document
-  user.password = await bcrypt.hash(user.password, Number(config.BCRYPT_SALT));
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(env.BCRYPT_SALT_ROUNDS),
+  );
 
   // calling next function/middleware
   next();

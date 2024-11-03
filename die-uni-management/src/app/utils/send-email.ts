@@ -1,14 +1,14 @@
 import nodemailer from "nodemailer";
-import config from "../config";
+import env from "../config";
 
 export const sendEmail = async (to: string, html: string) => {
   const transporter = nodemailer.createTransport({
-    host: config.SMTP_HOST,
+    host: env.SMTP_HOST,
     port: 587, // 465 not work all the time
-    secure: config.NODE_ENV !== "development", // true for port 465, false for other ports
+    secure: env.isProd, // true for port 465, false for other ports
     auth: {
-      user: config.SMTP_MAIL,
-      pass: config.SMTP_PASS,
+      user: env.SMTP_MAIL,
+      pass: env.SMTP_PASS,
     },
   });
 
