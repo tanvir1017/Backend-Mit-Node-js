@@ -57,13 +57,21 @@ router.route("/create-admin").post(
 router
   .route("/me")
   .get(
-    authGuard("student", "faculty", "admin", "superAdmin"),
+    authGuard(
+      USER_ROLE.superAdmin,
+      USER_ROLE.admin,
+      USER_ROLE.student,
+      USER_ROLE.faculty,
+    ),
     UserControllers.getMe,
   );
 
 // TODO => change user status
 router
   .route("/:id/change-status")
-  .post(authGuard("admin", "superAdmin"), UserControllers.changeStatus);
+  .post(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
+    UserControllers.changeStatus,
+  );
 
 export const UserRoutes = router;

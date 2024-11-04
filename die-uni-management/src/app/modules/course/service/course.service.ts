@@ -2,6 +2,7 @@ import httpStatus from "http-status-codes";
 import mongoose from "mongoose";
 import QueryBuilder from "../../../builder/QueryBuilder";
 import AppError from "../../../errors/appError";
+import { FacultyModel } from "../../faculty/model/faculty.model";
 import { courseSearchAbleFields } from "../constant/course.constant";
 import {
   TCourse,
@@ -165,16 +166,35 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
 };
 
 // TODO -> Assign faculties into course
-const assignFacultiesToCourse = async (
-  courseId: string,
-  payload: Partial<TCourseFaculty>,
-) => {
+const assignFacultiesToCourse = async (courseId: string, payload: string[]) => {
   if (!courseId) {
     throw new AppError(httpStatus.NOT_FOUND, "Course id missing");
   }
 
+  //* check courseId is valid or not
+  const isCourseIdExist = await CourseModel.findById(courseId);
+  if (!isCourseIdExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Course not found by this id");
+  }
+
+  //* check if faculty is array or not
   if (!Array.isArray(payload) || payload.length === 0) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Faculties are required");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Faculties are required with an array",
+    );
+  }
+
+  //* check faculty is valid or not
+  const isFacultiesExist = await FacultyModel.find({
+    _id: { $in: payload },
+  });
+
+  if (isFacultiesExist.length !== payload.length) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "There is a mismatch between faculties",
+    );
   }
 
   const result = await CourseFacultyModel.findByIdAndUpdate(
@@ -223,6 +243,12 @@ const getAllFacultiesFromDB = async () => {
   const result = await CourseFacultyModel.find().populate("course");
   return result;
 };
+const getFacultyWithCourseFromDB = async (courseId: string) => {
+  const result = await CourseFacultyModel.findOne({
+    course: courseId,
+  }).populate("faculties");
+  return result;
+};
 
 export const CourseServices = {
   createCourseIntoDB,
@@ -233,4 +259,5 @@ export const CourseServices = {
   assignFacultiesToCourse,
   removeFacultiesToCourse,
   getAllFacultiesFromDB,
+  getFacultyWithCourseFromDB,
 };

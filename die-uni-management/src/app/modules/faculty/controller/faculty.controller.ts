@@ -7,7 +7,6 @@ import { FacultyServices } from "../service/faculty.service";
 export const FacultyControllers = {
   // TODO => get all faculties
   getAllFaculties: asyncHandler(async (req, res) => {
-    console.log(req.cookies);
     const result = await FacultyServices.getAllFacultyFromDB();
     if (!result) {
       return sendResponse(res, {

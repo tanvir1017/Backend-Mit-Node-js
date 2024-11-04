@@ -109,7 +109,7 @@ const updateCourse = asyncHandler(async (req, res) => {
 
 const assignFaculties = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
-  const { faculties }: { faculties: TCourseFaculty } = req.body;
+  const { faculties }: { faculties: string[] } = req.body;
 
   const result = await CourseServices.assignFacultiesToCourse(
     courseId,
@@ -150,6 +150,17 @@ const getAllFaculties = asyncHandler(async (req, res) => {
   });
 });
 
+const getFacultiesWithCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const result = await CourseServices.getFacultyWithCourseFromDB(courseId);
+  sendResponse(res, {
+    statuscode: httpStatus.CREATED,
+    success: true,
+    message: "Assigned faculty retrieve successfully",
+    data: result,
+  });
+});
+
 export const CourseControllers = {
   getAllCourses,
   deleteCourse,
@@ -159,4 +170,5 @@ export const CourseControllers = {
   assignFaculties,
   removeFaculties,
   getAllFaculties,
+  getFacultiesWithCourse,
 };

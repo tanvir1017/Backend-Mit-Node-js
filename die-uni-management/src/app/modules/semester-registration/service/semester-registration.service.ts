@@ -170,10 +170,6 @@ const deleteSemesterRegistrationFromDB = async (id: string) => {
         session,
       },
     );
-    console.log(
-      "🚀 ~ deleteSemesterRegistrationFromDB ~ deletedOfferedCourse:",
-      deletedOfferedCourse,
-    );
 
     if (!deletedOfferedCourse) {
       throw new AppError(400, "Failed to delete semester registration !");

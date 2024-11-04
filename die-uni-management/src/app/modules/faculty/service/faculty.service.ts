@@ -56,7 +56,6 @@ export const FacultyServices = {
         updateAbleData[`name.${key}`] = value; // Fixed: Added '?' for optional chaining
       }
     }
-    console.log("🚀 ~ updateAbleData:", updateAbleData);
 
     const result = await FacultyModel.findByIdAndUpdate(id, updateAbleData, {
       new: true,

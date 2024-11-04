@@ -65,7 +65,6 @@ const changeOldPassword = async (
   userData: JwtPayload,
   payload: PasswordData,
 ) => {
-  console.log(userData);
   const user = await User.isUserExistByCustomId(userData.userId);
 
   //* check if user exists in DB by id

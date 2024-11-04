@@ -9,6 +9,7 @@ const router = express.Router();
 
 // TODO => Create a new academic Semester route
 router.route("/create-academic-semester").post(
+  authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
   // validator middleware called sanitizedClient
   sanitizeClientDataViaZod(
     AcademicSemesterValidationZOD.createAcademicSemesterValidation,
@@ -27,9 +28,13 @@ router
 // TODO => get only single academic semester route
 router
   .route("/:semesterID")
-
   .get(
-    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+    authGuard(
+      USER_ROLE.superAdmin,
+      USER_ROLE.admin,
+      USER_ROLE.faculty,
+      USER_ROLE.student,
+    ),
     AcademicSemesterControllers.getSingleAcademicSemester,
   );
 

@@ -6,11 +6,16 @@ import { CourseControllers } from "../controller/course.controller";
 import { CourseValidationViaZOD } from "../validation/course.validation";
 const router = express.Router();
 
-router.route("/all").get(CourseControllers.getAllCourses);
+router
+  .route("/all")
+  .get(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+    CourseControllers.getAllCourses,
+  );
 router
   .route("/create-course")
   .post(
-    authGuard(USER_ROLE.admin),
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
     sanitizeClientDataViaZod(
       CourseValidationViaZOD.createCourseSchemaValidation,
     ),
@@ -20,7 +25,7 @@ router
 router
   .route("/:id/update")
   .patch(
-    authGuard("admin"),
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
     sanitizeClientDataViaZod(
       CourseValidationViaZOD.updateCourseSchemaValidation,
     ),
@@ -29,20 +34,35 @@ router
 
 router
   .route("/:id/delete")
-  .delete(authGuard("admin"), CourseControllers.deleteCourse);
+  .delete(
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
+    CourseControllers.deleteCourse,
+  );
 
 router
   .route("/:courseId/assign-faculties")
   .put(
-    authGuard("admin", "faculty"),
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
     sanitizeClientDataViaZod(CourseValidationViaZOD.facultiesWithCourse),
     CourseControllers.assignFaculties,
   );
 
 router
+  .route("/:courseId/get-faculties")
+  .get(
+    authGuard(
+      USER_ROLE.superAdmin,
+      USER_ROLE.admin,
+      USER_ROLE.faculty,
+      USER_ROLE.student,
+    ),
+    CourseControllers.getFacultiesWithCourse,
+  );
+
+router
   .route("/:courseId/remove-faculties")
   .delete(
-    authGuard("admin"),
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin),
     sanitizeClientDataViaZod(CourseValidationViaZOD.facultiesWithCourse),
     CourseControllers.removeFaculties,
   );
@@ -50,14 +70,14 @@ router
 router
   .route("/course-faculties")
   .get(
-    authGuard("admin", "student", "faculty"),
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
     CourseControllers.getAllFaculties,
   );
 
 router
   .route("/:id")
   .get(
-    authGuard("admin", "student", "faculty"),
+    authGuard(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
     CourseControllers.getSingleCourse,
   );
 const CourseRoutes = router;
