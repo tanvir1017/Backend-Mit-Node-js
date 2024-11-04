@@ -38,4 +38,5 @@ app.use(globalErrorHandler);
 // TODO  => Not Found handler route
 app.use(notFound);
 
+// finally export all the things from express as app
 export default app;
