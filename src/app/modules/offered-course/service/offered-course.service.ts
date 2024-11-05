@@ -1,10 +1,14 @@
+import { StatusCodes as httpsStatuscode } from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import mongoose, { Schema } from "mongoose";
+import QueryBuilder from "../../../builder/QueryBuilder";
 import AppError from "../../../errors/appError";
 import { AcademicDepartment } from "../../academic-department/model/academic-department.model";
 import { AcademicFaculty } from "../../academic-faculty/model/academic-faculty.model";
 import { CourseModel } from "../../course/model/course.model";
 import { FacultyModel } from "../../faculty/model/faculty.model";
 import { SemesterRegistrationModel } from "../../semester-registration/model/semester-registration.model";
+import StudentModel from "../../student/model/student.model";
 import { TOfferCourse } from "../interface/offered-course.interface";
 import OfferCourseModel from "../model/offered-course.model";
 import { OfferedCourseUtils } from "../utils/offered-course.utils";
@@ -191,16 +195,82 @@ const updateOfferedCourseIntoDB = async (
 
 // TODO => Get all offered Courses
 const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
-  const result = await OfferCourseModel.find();
+  const offeredCourses = new QueryBuilder(OfferCourseModel.find(), query)
+    .filter()
+    .sort()
+    .paginate()
+    .fieldLimiting();
+  const result = await offeredCourses.modelQuery;
+  const meta = await offeredCourses.countTotal();
 
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {};
+
+const getMyOfferedCoursesFromDB = async (payload: JwtPayload) => {
+  const { userId } = payload;
+
+  // * find the student
+  const student = await StudentModel.findOne({ id: userId });
+  if (!student) {
+    throw new AppError(httpsStatuscode.NOT_FOUND, "Student not found");
+  }
+
+  //* find the academic department according to this student
+  const currentOngoingSemester = await SemesterRegistrationModel.findOne({
+    status: "ONGOING",
+  });
+  console.log(
+    "🚀 ~ getMyOfferedCoursesFromDB ~ currentOngoingSemester:",
+    currentOngoingSemester,
+  );
+
+  if (!currentOngoingSemester) {
+    throw new AppError(
+      httpsStatuscode.NOT_FOUND,
+      "no current ongoing semester is running",
+    );
+  }
+
+  const result = await OfferCourseModel.aggregate([
+    {
+      $match: {
+        semesterRegistration: currentOngoingSemester._id,
+        academicFaculty: student.academicFaculty,
+        academicDepartment: student.academicDepartment,
+      },
+    },
+    {
+      $lookup: {
+        from: "courses",
+        localField: "course",
+        foreignField: "_id",
+        as: "course",
+      },
+    },
+    {
+      $lookup: {
+        from: "academicdepartments",
+        localField: "academicDepartment",
+        foreignField: "_id",
+        as: "academicDepartment",
+      },
+    },
+  ]);
+
+  return {
+    result: result,
+  };
+};
 
 export const OfferedCourseServices = {
   createOfferedCourseIntoDB,
   updateOfferedCourseIntoDB,
   getAllOfferedCoursesFromDB,
   getSingleOfferedCourseFromDB,
+  getMyOfferedCoursesFromDB,
 };

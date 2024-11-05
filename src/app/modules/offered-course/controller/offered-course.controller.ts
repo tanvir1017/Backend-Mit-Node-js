@@ -1,3 +1,4 @@
+import { StatusCodes as httpsStatusCode } from "http-status-codes";
 import asyncHandler from "../../../utils/asyncHandler";
 import sendResponse from "../../../utils/sendResponse";
 import { OfferedCourseServices } from "../service/offered-course.service";
@@ -42,6 +43,18 @@ const getAllOfferedCourses = asyncHandler(async (req, res) => {
   });
 });
 
+const getMyOfferedCourse = asyncHandler(async (req, res) => {
+  const result = await OfferedCourseServices.getMyOfferedCoursesFromDB(
+    req.user,
+  );
+  sendResponse(res, {
+    statuscode: httpsStatusCode.OK,
+    message: "My all offered course retrieved successfully",
+    success: true,
+    data: result,
+  });
+});
+
 const getSingleOfferedCourse = asyncHandler(async (req, res) => {});
 
 export const OfferedCourseControllers = {
@@ -49,4 +62,5 @@ export const OfferedCourseControllers = {
   updateOfferedCourse,
   getAllOfferedCourses,
   getSingleOfferedCourse,
+  getMyOfferedCourse,
 };
